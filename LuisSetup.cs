@@ -9,8 +9,6 @@ namespace UniBotJG
     public class LuisSetup : IRecognizer
     {
         private readonly LuisRecognizer _recognizer;
-
-        
         public LuisSetup(IConfiguration configuration)
         {
             //Check appsettings.json for values in the LUIS fields

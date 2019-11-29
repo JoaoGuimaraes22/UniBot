@@ -12,7 +12,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using UniBotJG.Bots;
-using UniBotJG.Dialogs.Greeting;
+using UniBotJG.Dialogs;
 
 namespace UniBotJG
 {
@@ -49,10 +49,11 @@ namespace UniBotJG
             services.AddSingleton<IBotFrameworkHttpAdapter, AdapterWithErrorHandler>();
 
             // The Dialog that will be run by the bot.
-            services.AddSingleton<GreetingDialog>();
+            services.AddSingleton<MainDialog>();
+            //services.AddSingleton<FamilyServiceDialog>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
-            services.AddTransient<IBot, UniBot<GreetingDialog>>();
+            services.AddTransient<IBot, UniBot<MainDialog>>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

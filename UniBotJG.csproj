@@ -6,6 +6,17 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migration\**" />
+    <Compile Remove="Models\**" />
+    <Content Remove="Migration\**" />
+    <Content Remove="Models\**" />
+    <EmbeddedResource Remove="Migration\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Migration\**" />
+    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.Bot.Builder.AI.Luis" Version="4.6.3" />
     <PackageReference Include="Microsoft.Bot.Builder.Dialogs" Version="4.6.3" />
     <PackageReference Include="Microsoft.Bot.Builder.Integration.AspNet.Core" Version="4.6.2" />
@@ -17,10 +28,5 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Migration\" />
-      <Folder Include="Models\" />
-    </ItemGroup>
 
 </Project>
