@@ -1,0 +1,206 @@
+﻿{
+
+  "luis_schema_version": "3.2.0",
+  "versionId": "0.1",
+  "name": "UniBot-luis",
+  "desc": "Luis Model for UniBot",
+  "culture": "en-us",
+  "tokenizerVersion": "1.0.0",
+  "intents": [
+    {
+      "name": "Email"
+    },
+    {
+      "name": "GetRealPerson"
+    },
+    {
+      "name": "MyAdvantage"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "Phone"
+    },
+    {
+      "nome": "ServicesToShareWithFamily"
+    }
+  ],
+  "entities": [],
+  "composites": [],
+  "closedLists": [],
+  "patternAnyEntities": [],
+  "regex_entities": [],
+  "prebuiltEntities": [],
+  "model_features": [],
+  "regex_features": [],
+  "patterns": [],
+  "utterances": [
+    //Email
+    {
+      "text": "send to gmail",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "send to hotmail",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "send to email",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "send to hotmail",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "sapo",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "outlook",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "hotmail",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "to mail",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "to gmail",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "to mail",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "mail",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "email",
+      "intent": "Email",
+      "entities": []
+    },
+    {
+      "text": "my email",
+      "intent": "Email",
+      "entities": []
+    },
+    //GetRealPerson
+    {
+      "text": "i want to talk with a person",
+      "intent": "GetRealPerson",
+      "entities": []
+    },
+    {
+      "text": "i want to speak with a real person",
+      "intent": "GetRealPerson",
+      "entities": []
+    },
+    {
+      "text": "find me a specialist",
+      "intent": "GetRealPerson",
+      "entities": []
+    },
+    {
+      "text": "i don't wish to speak with a bot",
+      "intent": "GetRealPerson",
+      "entities": []
+    },
+    {
+      "text": "i want to speak with a specialist",
+      "intent": "GetRealPerson",
+      "entities": []
+    },
+    {
+      "text": "find a person for me to talk to",
+      "intent": "GetRealPerson",
+      "entities": []
+    },
+    //MyAdvantages
+    {
+      "text": "what would be the advantages",
+      "intent": "MyAdvantages",
+      "entities": []
+    },
+    {
+      "text": "what would be the advantages",
+      "intent": "and what other advantages do I get?",
+      "entities": []
+    },
+    //Phone
+    {
+      "text": "my mobile",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "the mobile",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "the phone",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "my telephone",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "my tele",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "my phone",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "mobile phone",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "telephone",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "tele",
+      "intent": "Phone",
+      "entities": []
+    },
+    {
+      "text": "phone",
+      "intent": "Phone",
+      "entities": []
+    },
+    //ServicesToShareWithFamilly
+    {
+      "text": "hi i am looking for a service that I can use and share with my family",
+      "intent": "ServiceToShareWithFamily",
+      "entities": []
+    }
+  ],
+  "settings":  []
+}
