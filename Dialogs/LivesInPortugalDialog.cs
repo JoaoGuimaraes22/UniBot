@@ -35,11 +35,17 @@ namespace UniBotJG.Dialogs
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
+                IntroStepAsync,
                 LivesInPortugalAsync,
                 RetryLivesInPortugalAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
+        }
+
+        private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok, I will need to gather some information in order to help you.\nDo you live in Portugal?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> LivesInPortugalAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -57,10 +63,8 @@ namespace UniBotJG.Dialogs
             }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
-                var userProfile = new UserProfile
-                {
-                    LivesInPortugal = false
-                };
+                var userProfile = new UserProfile();
+                userProfile.LivesInPortugal = false;
                 return await stepContext.BeginDialogAsync(nameof(HaveAnAccountDialog));
             }
             else

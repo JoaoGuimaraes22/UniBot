@@ -33,15 +33,37 @@ namespace UniBotJG.Dialogs
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
-                InitialStepAsync,
+                AskForAccountAsync,
+                HasAccountAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
         }
-
-        private async Task<DialogTurnResult> InitialStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> AskForAccountAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Worked") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Do you already have an account? ") }, cancellationToken);
+        }
+
+        private async Task<DialogTurnResult> HasAccountAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            if (!_recognizer.IsConfigured)
+            {
+                await stepContext.Context.SendActivityAsync(
+                MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                return await stepContext.NextAsync(null, cancellationToken);
+            }
+
+            var userProfile = new UserProfile();
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+
+            if ((luisResult.TopIntent().intent == LuisIntents.Intent.Yes && userProfile.LivesInPortugal) || ((luisResult.TopIntent().intent == LuisIntents.Intent.Yes) && (userProfile.LivesInPortugal == false)) || ((luisResult.TopIntent().intent == LuisIntents.Intent.No) && (userProfile.LivesInPortugal)))
+            {
+                return await stepContext.BeginDialogAsync(nameof(SuitCustomerNeedsDialog));
+            }
+            else
+            {
+                return await stepContext.BeginDialogAsync(nameof(GiveOptionsDialog), null, cancellationToken);
+            }
         }
     }
 }

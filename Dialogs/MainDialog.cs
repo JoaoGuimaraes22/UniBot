@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState, FamilyServiceDialog familyServiceDialog, NoUnderstandDialog getAssistantDialog)
+        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState, LivesInPortugalDialog familyServiceDialog, NoUnderstandDialog getAssistantDialog)
             : base(nameof(MainDialog))
         {
             _recognizer = luisRecognizer;
@@ -73,7 +73,7 @@ namespace UniBotJG.Dialogs
                 var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
                 if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
                 {
-                    return await stepContext.BeginDialogAsync(nameof(FamilyServiceDialog), null, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(LivesInPortugalDialog), null, cancellationToken);
                 }
                 else
                 {
@@ -94,7 +94,7 @@ namespace UniBotJG.Dialogs
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
             {
-                return await stepContext.BeginDialogAsync(nameof(FamilyServiceDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(LivesInPortugalDialog), null, cancellationToken);
             }
             else
             {
