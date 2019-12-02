@@ -19,7 +19,9 @@ namespace UniBotJG.CognitiveModels
             MyAdvantages,
             None,
             Phone,
-            ServiceToShareWithFamily
+            ServiceToShareWithFamily,
+            Yes,
+            No,
         };
         public Dictionary<Intent, IntentScore> Intents;
 

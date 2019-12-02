@@ -200,6 +200,83 @@
       "text": "hi i am looking for a service that I can use and share with my family",
       "intent": "ServiceToShareWithFamily",
       "entities": []
+    },
+    //Yes
+    {
+      "text": "go ahead",
+      "intent": "Yes",
+      "entities": []
+    },
+    {
+      "text": "sure thing",
+      "intent": "Yes",
+      "entities": []
+    },
+    {
+      "text": "sure",
+      "intent": "Yes",
+      "entities": []
+    },
+    {
+      "text": "yap",
+      "intent": "Yes",
+      "entities": []
+    },
+    {
+      "text": "yes",
+      "intent": "Yes",
+      "entities": []
+    },
+    {
+      "text": "yeah",
+      "intent": "Yes",
+      "entities": []
+    },
+    //No
+    {
+      "text": "i don't",
+      "intent": "No",
+      "entities": []
+    },
+    {
+      "text": "don't",
+      "intent": "No",
+      "entities": []
+    },
+    {
+      "text": "not for me",
+      "intent": "No",
+      "entities": []
+    },
+    {
+      "text": "not really",
+      "intent": "No",
+      "entities": []
+    },
+    {
+      "text": "no for this",
+      "intent": "No",
+      "entities": []
+    },
+    {
+      "text": "not now",
+      "intent": "No",
+      "entities": []
+    },
+    {
+      "text": "nah",
+      "intent": "No",
+      "entities": []
+    },
+    {
+      "text": "nop",
+      "intent": "No",
+      "entities": []
+    },
+    {
+      "text": "no",
+      "intent": "No",
+      "entities": []
     }
   ],
   "settings":  []

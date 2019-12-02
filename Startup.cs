@@ -54,7 +54,8 @@ namespace UniBotJG
             // The Dialog that will be run by the bot.
             services.AddSingleton<MainDialog>();
             services.AddSingleton<FamilyServiceDialog>();
-            services.AddSingleton<GetAssistantDialog>();
+            services.AddSingleton<NoUnderstandDialog>();
+            services.AddSingleton<SuitCustomerNeedsDialog>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, UniBot<MainDialog>>();
