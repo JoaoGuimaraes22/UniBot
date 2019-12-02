@@ -13,6 +13,7 @@ namespace UniBotJG.StateManagement
 
         public int Age { get; set; }
 
+        public bool HasBeenPrompted { get; set; } = false;
         public bool GavePermission { get; set; } = false;
     }
 }

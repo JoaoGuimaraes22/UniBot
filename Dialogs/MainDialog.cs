@@ -10,6 +10,7 @@ using Microsoft.Bot.Builder.AI.Luis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Schema;
 using UniBotJG.CognitiveModels;
+using UniBotJG.StateManagement;
 
 namespace UniBotJG.Dialogs
 {
@@ -44,6 +45,8 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            var userProfile = new UserProfile();
+            
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -52,16 +55,22 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
 
+            if(userProfile.HasBeenPrompted == false) {
+                var messageText = stepContext.Options?.ToString() ?? "What can I help you with today?";
+                var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
+            }
+            else
+            {
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("I'm sorry, I didn't understand that. Could you rephrase that so I can try to understand better?") }, cancellationToken);
+            }
             // Use the text provided in FinalStepAsync or the default if it is the first time.
-
-
-            var messageText = stepContext.Options?.ToString() ?? "What can I help you with today?";
-            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
+            
         }
 
         private async Task<DialogTurnResult> InitialIntentAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            var userProfile = new UserProfile();
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -72,26 +81,25 @@ namespace UniBotJG.Dialogs
             else
             {
                 var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-                switch (luisResult.TopIntent().intent)
+                if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
                 {
-                    case LuisIntents.Intent.ServiceToShareWithFamily:
-                        await stepContext.BeginDialogAsync(nameof(FamilyServiceDialog), null, cancellationToken);
-                        break;
-                    default:
-                        int promptNumber = 0;
-                        if (promptNumber == 0)
-                        {
-                            promptNumber++;
-                            await stepContext.ReplaceDialogAsync(nameof(MainDialog), new PromptOptions { Prompt = MessageFactory.Text("I'm sorry, I didn't understand that. Could you please say it in a another way?") }, cancellationToken);
-                            break;
-                        }
-                        else
-                        {
-                            await stepContext.BeginDialogAsync(nameof(GetAssistantDialog), null, cancellationToken);
-                            break;
-                        }
+                    return await stepContext.BeginDialogAsync(nameof(FamilyServiceDialog), null, cancellationToken);
                 }
-                return await stepContext.BeginDialogAsync(nameof(GetAssistantDialog), null, cancellationToken);
+                else
+                {
+                    if(userProfile.HasBeenPrompted == false)
+                    {
+                        userProfile.HasBeenPrompted = true;
+                        return await stepContext.ReplaceDialogAsync(nameof(MainDialog), null, cancellationToken);
+                    }
+                    else
+                    {
+                        userProfile.HasBeenPrompted = false;
+                       return await stepContext.BeginDialogAsync(nameof(GetAssistantDialog), null, cancellationToken);
+                    }
+                }
+
+                        
             }
 
         }
