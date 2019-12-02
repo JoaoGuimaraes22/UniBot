@@ -20,7 +20,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public HaveAnAccountDialog(LuisSetup luisRecognizer, ILogger<HaveAnAccountDialog> logger, UserState userState)
+        public HaveAnAccountDialog(LuisSetup luisRecognizer, ILogger<HaveAnAccountDialog> logger, UserState userState, GiveOptionsDialog giveOptions, SuitCustomerNeedsDialog suitCustomer)
             : base(nameof(HaveAnAccountDialog))
         {
             _recognizer = luisRecognizer;
@@ -30,6 +30,8 @@ namespace UniBotJG.Dialogs
             //AddDialog(new MainDialog());
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(new TextPrompt(nameof(TextPrompt)));
+            AddDialog(giveOptions);
+            AddDialog(suitCustomer);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {

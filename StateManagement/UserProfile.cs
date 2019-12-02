@@ -11,6 +11,7 @@ namespace UniBotJG.StateManagement
         //Storing User Data
         public bool HasAccount { get; set; }
         public bool LivesInPortugal{ get; set; }
+        public bool HelpMe { get; set; } = false;
         public bool HasBeenPrompted { get; set; } = false;
         public bool GavePermission { get; set; } = false;
     }
