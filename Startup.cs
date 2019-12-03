@@ -62,6 +62,10 @@ namespace UniBotJG
             services.AddSingleton<AdvantagesDialog>();
             services.AddSingleton<InfoSendDialog>();
             services.AddSingleton<PermissionDialog>();
+            services.AddSingleton<SendContactInfoDialog>();
+            services.AddSingleton<InitialServiceDialog>();
+            services.AddSingleton<NoPermissionDialog>();
+
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
             services.AddTransient<IBot, UniBot<MainDialog>>();

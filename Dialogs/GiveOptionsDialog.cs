@@ -20,7 +20,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public GiveOptionsDialog(LuisSetup luisRecognizer, ILogger<GiveOptionsDialog> logger, UserState userState, WhereToReceiveDialog whereToReceive, NoUnderstandDialog noUnderstand, InfoSendDialog infoSend)
+        public GiveOptionsDialog(LuisSetup luisRecognizer, ILogger<GiveOptionsDialog> logger, UserState userState, WhereToReceiveDialog whereToReceive, NoUnderstandDialog noUnderstand, InfoSendDialog infoSend, AdvantagesDialog advantages)
             : base(nameof(GiveOptionsDialog))
         {
             _recognizer = luisRecognizer;
@@ -33,6 +33,7 @@ namespace UniBotJG.Dialogs
             AddDialog(whereToReceive);
             AddDialog(noUnderstand);
             AddDialog(infoSend);
+            AddDialog(advantages);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {

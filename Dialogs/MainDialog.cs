@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState, LivesInPortugalDialog familyServiceDialog, NoUnderstandDialog getAssistantDialog)
+        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState, LivesInPortugalDialog familyServiceDialog, NoUnderstandDialog getAssistantDialog, InitialServiceDialog initialService)
             : base(nameof(MainDialog))
         {
             _recognizer = luisRecognizer;
@@ -32,12 +32,13 @@ namespace UniBotJG.Dialogs
             AddDialog(new ConfirmPrompt(nameof(ConfirmPrompt)));
             AddDialog(familyServiceDialog);
             AddDialog(getAssistantDialog);
+            AddDialog(initialService);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 IntroStepAsync,
-                InitialIntentAsync,
-                RetryAsync,
+                AllowInfoStoreAsync,
+                RetryAllowInfoStoreAsync,
             }));
 
             // The initial child Dialog to run.
@@ -53,14 +54,16 @@ namespace UniBotJG.Dialogs
 
                 return await stepContext.NextAsync(null, cancellationToken);
             }
-            var messageText = stepContext.Options?.ToString() ?? "What can I help you with today?";
+            var messageText = stepContext.Options?.ToString() ?? "Hi welcome to Crédito Agrícola, Do you allow me to store and process your personal information in order to provide you with a better experience?";
             var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
             // Use the text provided in FinalStepAsync or the default if it is the first time.
         }
 
-        private async Task<DialogTurnResult> InitialIntentAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> AllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            var userProfile = new UserProfile();
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -70,38 +73,47 @@ namespace UniBotJG.Dialogs
             }
             else
             {
-                var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-                if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
+                if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
                 {
-                    return await stepContext.BeginDialogAsync(nameof(LivesInPortugalDialog), null, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(InitialServiceDialog), null, cancellationToken);
                 }
-                else
+                if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
                 {
-                    return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry I didn’t understand you. Can you please repeat what you said?")}, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
                 }
-            }
 
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
+
+            }
         }
 
-        private async Task<DialogTurnResult> RetryAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> RetryAllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            var userProfile = new UserProfile();
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
-                MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+
                 return await stepContext.NextAsync(null, cancellationToken);
-            }
-            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-            if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
-            {
-                return await stepContext.BeginDialogAsync(nameof(LivesInPortugalDialog), null, cancellationToken);
             }
             else
             {
-                return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
-            }
+                if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+                {
+                    return await stepContext.BeginDialogAsync(nameof(InitialServiceDialog), null, cancellationToken);
+                }
+                if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
+                {
+                    return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
+                }
 
+                return await stepContext.PromptAsync(nameof(NoUnderstandDialog), null, cancellationToken);
+
+            }
         }
+        
     }
 
     
