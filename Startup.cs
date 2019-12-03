@@ -59,10 +59,8 @@ namespace UniBotJG
             services.AddSingleton<HaveAnAccountDialog>();
             services.AddSingleton<GiveOptionsDialog>();
             services.AddSingleton<WhereToReceiveDialog>();
-            services.AddSingleton<AdvantagesDialog>();
             services.AddSingleton<InfoSendDialog>();
-            services.AddSingleton<PermissionDialog>();
-            services.AddSingleton<SendContactInfoDialog>();
+            services.AddSingleton<SendContactDialog>();
             services.AddSingleton<InitialServiceDialog>();
             services.AddSingleton<NoPermissionDialog>();
             services.AddSingleton<IsClientDialog>();

@@ -54,7 +54,7 @@ namespace UniBotJG.Dialogs
             //}
             //var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("To give you a more accurate service  I will need your NIF. Can you please provide me that information?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("To give you a more accurate service, please provide your your NIF.") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> GetNIFAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)

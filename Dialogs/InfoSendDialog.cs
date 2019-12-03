@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public InfoSendDialog(LuisSetup luisRecognizer, ILogger<InfoSendDialog> logger, UserState userState, PermissionDialog permissionDialog, NoUnderstandDialog noUnderstand)
+        public InfoSendDialog(LuisSetup luisRecognizer, ILogger<InfoSendDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, SendContactDialog sendContact)
             : base(nameof(InfoSendDialog))
         {
             _recognizer = luisRecognizer;
@@ -31,8 +31,8 @@ namespace UniBotJG.Dialogs
             //AddDialog(new MainDialog());
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
-            AddDialog(permissionDialog);
             AddDialog(noUnderstand);
+            AddDialog(sendContact);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -46,7 +46,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> WhereAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. Where would you like to receive additional information: Phone or e-mail?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("This account gives you freedom to perform your operations in Portugal and overseas; Flexibility to move it in the currency you desire and access to exclusive products. Would you like to get this and more detailed information on your phone or email?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> PhoneOrEmailAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -64,12 +64,12 @@ namespace UniBotJG.Dialogs
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Email)
             {
                 userProfile.ChosePhone = true;
-                return await stepContext.BeginDialogAsync(nameof(PermissionDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(SendContactDialog), null, cancellationToken);
             }
             if(luisResult.TopIntent().intent == LuisIntents.Intent.Phone)
             {
                 userProfile.ChoseEmail = true;
-                return await stepContext.BeginDialogAsync(nameof(PermissionDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(SendContactDialog), null, cancellationToken);
             }
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
         }
@@ -89,12 +89,12 @@ namespace UniBotJG.Dialogs
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Email)
             {
                 userProfile.ChosePhone = true;
-                return await stepContext.BeginDialogAsync(nameof(PermissionDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(SendContactDialog), null, cancellationToken);
             }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Phone)
             {
                 userProfile.ChoseEmail = true;
-                return await stepContext.BeginDialogAsync(nameof(PermissionDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(SendContactDialog), null, cancellationToken);
             }
             return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
         }

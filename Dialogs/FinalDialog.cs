@@ -15,20 +15,19 @@ using UniBotJG.StateManagement;
 
 namespace UniBotJG.Dialogs
 {
-    public class NoPermissionDialog : ComponentDialog
+    public class FinalDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public NoPermissionDialog(LuisSetup luisRecognizer, ILogger<NoPermissionDialog> logger, UserState userState)
-            : base(nameof(NoPermissionDialog))
+        public FinalDialog(LuisSetup luisRecognizer, ILogger<NoPermissionDialog> logger, UserState userState)
+            : base(nameof(FinalDialog))
         {
             _recognizer = luisRecognizer;
             _userState = userState;
             Logger = logger;
 
-            //AddDialog(new MainDialog());
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
 
@@ -42,7 +41,15 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> TestAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("No permission") }, cancellationToken);
+            //if (!_recognizer.IsConfigured)
+            //{
+            //    await stepContext.Context.SendActivityAsync(
+            //    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+            //    return await stepContext.NextAsync(null, cancellationToken);
+            //}
+            //var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Isn't client") }, cancellationToken);
         }
     }
 }

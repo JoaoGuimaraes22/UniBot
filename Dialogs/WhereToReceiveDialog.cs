@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public WhereToReceiveDialog(LuisSetup luisRecognizer, ILogger<WhereToReceiveDialog> logger, UserState userState)
+        public WhereToReceiveDialog(LuisSetup luisRecognizer, ILogger<WhereToReceiveDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GetAssistantDialog getAssistant, FinalDialog finalDialog)
             : base(nameof(WhereToReceiveDialog))
         {
             _recognizer = luisRecognizer;
@@ -31,24 +31,68 @@ namespace UniBotJG.Dialogs
             //AddDialog(new MainDialog());
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
+            AddDialog(noUnderstand);
+            AddDialog(getAssistant);
+            AddDialog(finalDialog);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
-                OkEmployee,
-                EndOkEmployee,
+                OkEmployeeAsync,
+                EndOkEmployeeAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
         }
 
-        private async Task<DialogTurnResult> OkEmployee(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> OkEmployeeAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. An employee will receive you soon in order to provide with a better experience") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Would you like to be assisted by an employee that could provide a better experience?") }, cancellationToken);
         }
 
-        private async Task<DialogTurnResult> EndOkEmployee(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> EndOkEmployeeAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.EndDialogAsync();
+            if (!_recognizer.IsConfigured)
+            {
+                await stepContext.Context.SendActivityAsync(
+                MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                return await stepContext.NextAsync(null, cancellationToken);
+            }
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GetAssistantDialog), null, cancellationToken);
+            }
+            if(luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.BeginDialogAsync(nameof(FinalDialog), null, cancellationToken);
+            }
+            else
+            {
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
+            }
+        }
+
+        private async Task<DialogTurnResult> RetryEndOkEmployeeAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            if (!_recognizer.IsConfigured)
+            {
+                await stepContext.Context.SendActivityAsync(
+                MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                return await stepContext.NextAsync(null, cancellationToken);
+            }
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GetAssistantDialog), null, cancellationToken);
+            }
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.BeginDialogAsync(nameof(FinalDialog), null, cancellationToken);
+            }
+            else
+            {
+                return await stepContext.PromptAsync(nameof(NoUnderstandDialog), null, cancellationToken);
+            }
         }
     }
 }
