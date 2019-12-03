@@ -61,9 +61,9 @@ namespace UniBotJG.Dialogs
         {
             var userProfile = new UserProfile();
             var nifRegex = new Regex("^[0-9]+$");
-            if (nifRegex.IsMatch(stepContext.Values.ToString()))
+            if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
             {
-                userProfile.NIF = stepContext.Values.ToString();
+                userProfile.NIF = stepContext.Result.ToString();
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text($"To confirm, your NIF is {userProfile.NIF}, right?")}, cancellationToken);
             }
             else
@@ -99,9 +99,9 @@ namespace UniBotJG.Dialogs
             else
             {
                 var nifRegex = new Regex("^[0-9]+$");
-                if (nifRegex.IsMatch(stepContext.Values.ToString()))
+                if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
                 {
-                    userProfile.NIF = stepContext.Values.ToString();
+                    userProfile.NIF = stepContext.Result.ToString();
                     return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"To confirm, your NIF is {userProfile.NIF}, right?") }, cancellationToken);
                 }
                 else
@@ -119,9 +119,9 @@ namespace UniBotJG.Dialogs
             if( userProfile.NIF != "None")
             {
                 var nifRegex = new Regex("^[0-9]+$");
-                if (nifRegex.IsMatch(stepContext.Values.ToString()))
+                if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
                 {
-                    userProfile.NIF = stepContext.Values.ToString();
+                    userProfile.NIF = stepContext.Result.ToString();
                     return await stepContext.BeginDialogAsync(nameof(GetHelpDialog), null, cancellationToken);
                 }
                 else
