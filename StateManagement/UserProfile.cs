@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace UniBotJG.StateManagement
 {
-    
+
     public class UserProfile
     {
         //Storing User Data

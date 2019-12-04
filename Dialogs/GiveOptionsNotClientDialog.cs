@@ -15,41 +15,41 @@ using UniBotJG.StateManagement;
 
 namespace UniBotJG.Dialogs
 {
-    public class IsNotClientDialog : ComponentDialog
+    public class GiveOptionsNotClientDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public IsNotClientDialog(LuisSetup luisRecognizer, ILogger<IsNotClientDialog> logger, UserState userState, GiveOptionsNotClientDialog giveOptions, NoUnderstandDialog noUnderstand)
-            : base(nameof(IsNotClientDialog))
+        public GiveOptionsNotClientDialog(LuisSetup luisRecognizer, ILogger<GiveOptionsNotClientDialog> logger, UserState userState, WhereToReceiveDialog whereTo, InfoSendNotClientDialog infoSend, NoUnderstandDialog noUnderstand)
+            : base(nameof(GiveOptionsNotClientDialog))
         {
             _recognizer = luisRecognizer;
             _userState = userState;
             Logger = logger;
 
-            //AddDialog(new MainDialog());
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
-            AddDialog(giveOptions);
+            AddDialog(whereTo);
+            AddDialog(infoSend);
             AddDialog(noUnderstand);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
-                HelpAsync,
-                WhatToHelpAsync,
-                RetryWhatToHelpAsync,
+                OptionAsync,
+                MoreAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
         }
 
-        private async Task<DialogTurnResult> HelpAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> OptionAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. What can I help you with?") }, cancellationToken);
+            
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. We have an option that might suit your needs. The special account for emigrants is available for Portuguese emigrants that are over 18 years old and can be shared with your partner or son. Would you like to know more about this account?") }, cancellationToken);
         }
 
-        private async Task<DialogTurnResult> WhatToHelpAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> MoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             if (!_recognizer.IsConfigured)
             {
@@ -58,18 +58,21 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-            if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
-                return await stepContext.BeginDialogAsync(nameof(GiveOptionsNotClientDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(InfoSendNotClientDialog), null, cancellationToken);
+            }
+            if(luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.PromptAsync(nameof(WhereToReceiveDialog), null, cancellationToken);
             }
             else
             {
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
             }
-
         }
 
-        private async Task<DialogTurnResult> RetryWhatToHelpAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> RetryMoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             if (!_recognizer.IsConfigured)
             {
@@ -78,15 +81,18 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-            if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
-                return await stepContext.BeginDialogAsync(nameof(GiveOptionsNotClientDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(InfoSendNotClientDialog), null, cancellationToken);
+            }
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.PromptAsync(nameof(WhereToReceiveDialog), null, cancellationToken);
             }
             else
             {
-                return await stepContext.PromptAsync(nameof(NoUnderstandDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
             }
-
         }
     }
 }

@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public IsClientDialog(LuisSetup luisRecognizer, ILogger<IsClientDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GetHelpDialog getHelp)
+        public IsClientDialog(LuisSetup luisRecognizer, ILogger<IsClientDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GetHelpDialog getHelp, ReEnterNIFDialog reEnter)
             : base(nameof(IsClientDialog))
         {
             _recognizer = luisRecognizer;
@@ -32,6 +32,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(noUnderstand);
             AddDialog(getHelp);
+            AddDialog(reEnter);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -84,7 +85,7 @@ namespace UniBotJG.Dialogs
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             
-                var userProfile = new UserProfile();
+            var userProfile = new UserProfile();
             if(userProfile.NIF != "None")
             {
                 if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
@@ -93,7 +94,7 @@ namespace UniBotJG.Dialogs
                 }
                 else
                 {
-                    return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text("Ok, please re-enter the NIF")});
+                    return await stepContext.BeginDialogAsync(nameof(ReEnterNIFDialog), null, cancellationToken);
                 }
             }
             else
@@ -112,6 +113,7 @@ namespace UniBotJG.Dialogs
                 }
             }
         }
+
 
         private async Task<DialogTurnResult> ReConfirmNIFAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
