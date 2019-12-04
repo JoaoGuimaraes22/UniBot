@@ -34,7 +34,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 SayonaraAsync,
-                FINNALYENDINGITALLASYNC,
+                EndingAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
@@ -53,7 +53,7 @@ namespace UniBotJG.Dialogs
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Isn't client") }, cancellationToken);
         }
 
-        private async Task<DialogTurnResult> FINNALYENDINGITALLASYNC(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        private async Task<DialogTurnResult> EndingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             return await stepContext.EndDialogAsync();
         }

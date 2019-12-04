@@ -38,6 +38,7 @@ namespace UniBotJG.Dialogs
             {
                 OptionAsync,
                 MoreAsync,
+                RetryMoreAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
