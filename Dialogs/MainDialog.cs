@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState, LivesInPortugalDialog familyServiceDialog, NoUnderstandDialog getAssistantDialog, InitialServiceDialog initialService)
+        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState,  NoUnderstandDialog noUnderstand, InitialServiceDialog initialService, NoPermissionDialog noPermission)
             : base(nameof(MainDialog))
         {
             _recognizer = luisRecognizer;
@@ -30,9 +30,9 @@ namespace UniBotJG.Dialogs
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ConfirmPrompt(nameof(ConfirmPrompt)));
-            AddDialog(familyServiceDialog);
-            AddDialog(getAssistantDialog);
+            AddDialog(noUnderstand);
             AddDialog(initialService);
+            AddDialog(noPermission);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {

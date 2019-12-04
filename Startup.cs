@@ -52,20 +52,21 @@ namespace UniBotJG
             services.AddSingleton<LuisSetup>();
 
             // The Dialog that will be run by the bot.
-            services.AddSingleton<MainDialog>();
-            services.AddSingleton<NoUnderstandDialog>();
-            services.AddSingleton<SuitCustomerNeedsDialog>();
-            services.AddSingleton<LivesInPortugalDialog>();
-            services.AddSingleton<HaveAnAccountDialog>();
+            services.AddSingleton<FinalDialog>();
+            services.AddSingleton<GetAssistantDialog>();
+            services.AddSingleton<GetHelpDialog>();
             services.AddSingleton<GiveOptionsDialog>();
-            services.AddSingleton<WhereToReceiveDialog>();
+            services.AddSingleton<HaveAnAccountDialog>();
             services.AddSingleton<InfoSendDialog>();
-            services.AddSingleton<SendContactDialog>();
             services.AddSingleton<InitialServiceDialog>();
-            services.AddSingleton<NoPermissionDialog>();
             services.AddSingleton<IsClientDialog>();
             services.AddSingleton<IsNotClientDialog>();
-            services.AddSingleton<GetHelpDialog>();
+            services.AddSingleton<MainDialog>();
+            services.AddSingleton<NoPermissionDialog>();
+            services.AddSingleton<NoUnderstandDialog>();
+            services.AddSingleton<SendContactDialog>();
+            services.AddSingleton<SuitCustomerNeedsDialog>();
+            services.AddSingleton<WhereToReceiveDialog>();
 
 
 

@@ -27,7 +27,6 @@ namespace UniBotJG.Dialogs
             _userState = userState;
             Logger = logger;
 
-            //AddDialog(new MainDialog());
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(whereToReceive);

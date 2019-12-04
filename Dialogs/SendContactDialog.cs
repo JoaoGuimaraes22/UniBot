@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public SendContactDialog(LuisSetup luisRecognizer, ILogger<SendContactDialog> logger, UserState userState, GetHelpDialog getHelp)
+        public SendContactDialog(LuisSetup luisRecognizer, ILogger<SendContactDialog> logger, UserState userState/*, GetHelpDialog getHelp*/)
             : base(nameof(SendContactDialog))
         {
             _recognizer = luisRecognizer;
@@ -30,7 +30,7 @@ namespace UniBotJG.Dialogs
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
-            AddDialog(getHelp);
+            //AddDialog(getHelp);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -42,14 +42,6 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> SendAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //if (!_recognizer.IsConfigured)
-            //{
-            //    await stepContext.Context.SendActivityAsync(
-            //    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
-            //    return await stepContext.NextAsync(null, cancellationToken);
-            //}
-            //var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-            //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             var userProfile = new UserProfile();
             if (userProfile.ChosePhone == true)
             {
@@ -65,9 +57,9 @@ namespace UniBotJG.Dialogs
 
         }
 
-        private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            return await stepContext.BeginDialogAsync(nameof(GetHelpDialog), null, cancellationToken);
-        }
+        //private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        //{
+        //    return await stepContext.BeginDialogAsync(nameof(GetHelpDialog), null, cancellationToken);
+        //}
     }
 }

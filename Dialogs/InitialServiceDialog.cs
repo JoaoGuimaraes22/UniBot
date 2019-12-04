@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public InitialServiceDialog(LuisSetup luisRecognizer, ILogger<InitialServiceDialog> logger, UserState userState, IsClientDialog isClient, IsNotClientDialog isNot)
+        public InitialServiceDialog(LuisSetup luisRecognizer, ILogger<InitialServiceDialog> logger, UserState userState, IsClientDialog isClient, IsNotClientDialog isNot, NoUnderstandDialog noUnderstand)
             : base(nameof(InitialServiceDialog))
         {
             _recognizer = luisRecognizer;
@@ -33,6 +33,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(isClient);
             AddDialog(isNot);
+            AddDialog(noUnderstand);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {

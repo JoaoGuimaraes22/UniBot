@@ -39,6 +39,7 @@ namespace UniBotJG.Dialogs
             {
                 OkEmployeeAsync,
                 EndOkEmployeeAsync,
+                RetryEndOkEmployeeAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
