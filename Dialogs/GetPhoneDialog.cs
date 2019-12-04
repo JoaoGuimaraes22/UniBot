@@ -51,7 +51,7 @@ namespace UniBotJG.Dialogs
             //}
             //var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. In order to receive information about the Special Account for Emigrants you should send a text message saying “Emigrant” to the following number 151015. Is there anything else I can help you with?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. In order to receive information about the Special Account for Emigrants you should send a text message saying “Emigrant” to the following number 151015. Say anything if you want to continue this conversation.") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> FinalAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)

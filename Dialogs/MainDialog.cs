@@ -109,12 +109,9 @@ namespace UniBotJG.Dialogs
                     return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
                 }
 
-                return await stepContext.PromptAsync(nameof(NoUnderstandDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
 
             }
         }
-        
     }
-
-    
 }

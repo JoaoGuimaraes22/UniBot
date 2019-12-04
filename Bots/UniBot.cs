@@ -12,6 +12,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using UniBotJG.StateManagement;
 using UniBotJG.Dialogs;
+using Microsoft.Bot.Builder.AI.QnA;
+using System.Net.Http;
 
 namespace UniBotJG.Bots
 {
@@ -22,7 +24,7 @@ namespace UniBotJG.Bots
         private readonly BotState _userState;
         private readonly Dialog _dialog;
         private readonly ILogger _logger;
-
+        
         public UniBot(ConversationState conversationState, UserState userState, T dialog, ILogger<UniBot<T>> logger)
         {
             //Initiates states in bot
@@ -35,6 +37,7 @@ namespace UniBotJG.Bots
 
         protected override async Task OnMessageActivityAsync(ITurnContext<IMessageActivity> turnContext, CancellationToken cancellationToken)
         {
+
             //Gets the state properties from the turn context
             var conversationStateAccessors = _conversationState.CreateProperty<ConversationData>(nameof(ConversationData));
             var conversationData = await conversationStateAccessors.GetAsync(turnContext, () => new ConversationData());
