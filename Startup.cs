@@ -55,8 +55,10 @@ namespace UniBotJG
             services.AddSingleton<FinalDialog>();
             services.AddSingleton<GetAssistantDialog>();
             services.AddSingleton<GetHelpDialog>();
+            services.AddSingleton<GetPhoneDialog>();
             services.AddSingleton<GiveOptionsDialog>();
             services.AddSingleton<GiveOptionsNotClientDialog>();
+            services.AddSingleton<GoodbyeDialog>();
             services.AddSingleton<HaveAnAccountDialog>();
             services.AddSingleton<InfoSendDialog>();
             services.AddSingleton<InfoSendNotClientDialog>();
