@@ -61,6 +61,7 @@ namespace UniBotJG.Bots
             await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
         }
 
+        
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             foreach (var member in membersAdded)
@@ -71,6 +72,7 @@ namespace UniBotJG.Bots
                 }
             }
         }
+    
 
         private IActivity CreateActivityWithTextAndSpeak(string message)
         {

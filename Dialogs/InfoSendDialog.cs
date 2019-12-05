@@ -46,7 +46,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> WhereAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("This account gives you freedom to perform your operations in Portugal and overseas; Flexibility to move it in the currency you desire and access to exclusive products. Would you like to get this and more detailed information on your phone or email?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Would you like the information on on your phone or email?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> PhoneOrEmailAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -63,12 +63,12 @@ namespace UniBotJG.Dialogs
 
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Email)
             {
-                userProfile.ChosePhone = true;
+                userProfile.ChoseEmail = true;
                 return await stepContext.BeginDialogAsync(nameof(SendContactDialog), null, cancellationToken);
             }
             if(luisResult.TopIntent().intent == LuisIntents.Intent.Phone)
             {
-                userProfile.ChoseEmail = true;
+                userProfile.ChosePhone = true;
                 return await stepContext.BeginDialogAsync(nameof(SendContactDialog), null, cancellationToken);
             }
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);

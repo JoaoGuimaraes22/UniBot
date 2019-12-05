@@ -84,6 +84,7 @@ namespace UniBotJG
             services.AddSingleton<ReEnterNIFDialog>();
             services.AddSingleton<SendContactDialog>();
             services.AddSingleton<SuitCustomerNeedsDialog>();
+            services.AddSingleton<WantMoreDialog>();
             services.AddSingleton<WhereToReceiveDialog>();
 
             // Create the bot as a transient. In this case the ASP Controller is expecting an IBot.
