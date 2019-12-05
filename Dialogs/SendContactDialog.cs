@@ -47,7 +47,7 @@ namespace UniBotJG.Dialogs
             if (userProfile.ChosePhone == true)
             {
                 //Send SMS
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone.Is there anything helse I can help you with?") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone. Is there anything helse I can help you with?") }, cancellationToken);
             }
             else
             {
