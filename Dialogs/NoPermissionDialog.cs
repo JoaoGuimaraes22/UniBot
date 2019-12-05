@@ -25,7 +25,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public NoPermissionDialog(LuisSetup luisRecognizer, ILogger<NoPermissionDialog> logger, UserState userState, IConfiguration configuration, IHttpClientFactory httpClientFactory)
+        public NoPermissionDialog(LuisSetup luisRecognizer, ILogger<NoPermissionDialog> logger, UserState userState, IConfiguration configuration, IHttpClientFactory httpClientFactory, GoodbyeDialog goodbye)
             : base(nameof(NoPermissionDialog))
         {
             _recognizer = luisRecognizer;
@@ -37,6 +37,7 @@ namespace UniBotJG.Dialogs
             //AddDialog(new MainDialog());
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
+            AddDialog(goodbye);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -66,19 +67,33 @@ namespace UniBotJG.Dialogs
             null,
             httpClient);
 
+            if (!_recognizer.IsConfigured)
+            {
+                await stepContext.Context.SendActivityAsync(
+                MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                return await stepContext.NextAsync(null, cancellationToken);
+            }
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
+
             // The actual call to the QnA Maker service.
             var response = await qnaMaker.GetAnswersAsync(stepContext.Context);
             if (response != null && response.Length > 0)
             {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(response[0].Answer) }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"{response[0].Answer}. Is there anything else I can help you with?") }, cancellationToken);
             }
             else
             {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you.") }, cancellationToken);
             }
             
             //return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(/*response[0].Answer*/"Test")}, cancellationToken);
         }
+
+
 
         private async Task<DialogTurnResult> RetryEnd(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {

@@ -47,7 +47,7 @@ namespace UniBotJG.Dialogs
         private async Task<DialogTurnResult> StartNIFReAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok, please re-enter your NIF.") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. Can you please re-enter your NIF.") }, cancellationToken);
 
         }
 

@@ -68,7 +68,7 @@ namespace UniBotJG.Bots
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(CreateActivityWithTextAndSpeak($"Hello! \nEnter anything to begin the conversation."), cancellationToken);
+                    await turnContext.SendActivityAsync(CreateActivityWithTextAndSpeak($"Hi, welcome to Crédito Agrícola Bot! Do you allow me to store and process your personal information in order to provide you with a better experience?"), cancellationToken);
                 }
             }
         }

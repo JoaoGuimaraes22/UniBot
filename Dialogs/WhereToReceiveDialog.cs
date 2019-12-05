@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public WhereToReceiveDialog(LuisSetup luisRecognizer, ILogger<WhereToReceiveDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GetAssistantDialog getAssistant, FinalDialog finalDialog)
+        public WhereToReceiveDialog(LuisSetup luisRecognizer, ILogger<WhereToReceiveDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GetAssistantDialog getAssistant, NoPermissionDialog noPermission)
             : base(nameof(WhereToReceiveDialog))
         {
             _recognizer = luisRecognizer;
@@ -33,7 +33,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(noUnderstand);
             AddDialog(getAssistant);
-            AddDialog(finalDialog);
+            AddDialog(noPermission);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -65,7 +65,7 @@ namespace UniBotJG.Dialogs
             }
             if(luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
-                return await stepContext.BeginDialogAsync(nameof(FinalDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
             }
             else
             {
@@ -88,7 +88,7 @@ namespace UniBotJG.Dialogs
             }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
-                return await stepContext.BeginDialogAsync(nameof(FinalDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
             }
             else
             {

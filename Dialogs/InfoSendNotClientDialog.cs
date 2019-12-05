@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public InfoSendNotClientDialog(LuisSetup luisRecognizer, ILogger<InfoSendNotClientDialog> logger, UserState userState, FinalDialog finalDialog, NoUnderstandDialog noUnderstand, GetPhoneDialog getPhone)
+        public InfoSendNotClientDialog(LuisSetup luisRecognizer, ILogger<InfoSendNotClientDialog> logger, UserState userState, NoPermissionDialog noPermission, NoUnderstandDialog noUnderstand, GetPhoneDialog getPhone)
             : base(nameof(InfoSendNotClientDialog))
         {
             _recognizer = luisRecognizer;
@@ -30,7 +30,7 @@ namespace UniBotJG.Dialogs
 
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
-            AddDialog(finalDialog);
+            AddDialog(noPermission);
             AddDialog(noUnderstand);
             AddDialog(getPhone);
 
@@ -54,7 +54,7 @@ namespace UniBotJG.Dialogs
             //}
             //var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("The special account for emigrants gives you freedom to perform your operations in Portugal and overseas; Flexibility to move it in the currency you desire and access to exclusive products. Would you like to get this and more detailed information on your phone?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("The special account for emigrants gives you freedom to perform your operations in Portugal and overseas, flexibility to move it in the currency you desire and access to exclusive products. Would you like to get this and more detailed information on your phone?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> YesNoAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -72,11 +72,11 @@ namespace UniBotJG.Dialogs
             }
             if(luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
-                return await stepContext.BeginDialogAsync(nameof(FinalDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
             }
             else
             {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text("Sorry I was not able to understand that. Can you please repeat what you said?")}, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text("Sorry, I was not able to understand that. Can you please repeat what you said?")}, cancellationToken);
             }
         }
 
@@ -95,7 +95,7 @@ namespace UniBotJG.Dialogs
             }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
-                return await stepContext.BeginDialogAsync(nameof(FinalDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
             }
             else
             {

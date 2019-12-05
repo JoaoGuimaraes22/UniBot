@@ -41,7 +41,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> GetAssistantAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions{Prompt = MessageFactory.Text("Sorry I didn’t understand your request. An employee will receive you soon")}, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions{Prompt = MessageFactory.Text("I’m sorry but I was not able to understand you or your request. In order to provide you with a better experience an employee will receive you as soon as possible​") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> GoToAssistantAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)

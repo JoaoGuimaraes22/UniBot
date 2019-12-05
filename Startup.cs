@@ -65,7 +65,6 @@ namespace UniBotJG
 
             // The Dialog that will be run by the bot.
 
-            services.AddSingleton<FinalDialog>();
             services.AddSingleton<GetAssistantDialog>();
             services.AddSingleton<GetHelpDialog>();
             services.AddSingleton<GetPhoneDialog>();

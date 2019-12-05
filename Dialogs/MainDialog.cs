@@ -36,28 +36,12 @@ namespace UniBotJG.Dialogs
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
-                IntroStepAsync,
                 AllowInfoStoreAsync,
                 RetryAllowInfoStoreAsync,
             }));
 
             // The initial child Dialog to run.
             InitialDialogId = nameof(WaterfallDialog);
-        }
-
-        private async Task<DialogTurnResult> IntroStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {   
-            if (!_recognizer.IsConfigured)
-            {
-                await stepContext.Context.SendActivityAsync(
-                    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
-
-                return await stepContext.NextAsync(null, cancellationToken);
-            }
-            var messageText = stepContext.Options?.ToString() ?? "Hi welcome to Crédito Agrícola, Do you allow me to store and process your personal information in order to provide you with a better experience?";
-            var promptMessage = MessageFactory.Text(messageText, messageText, InputHints.ExpectingInput);
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = promptMessage }, cancellationToken);
-            // Use the text provided in FinalStepAsync or the default if it is the first time.
         }
 
         private async Task<DialogTurnResult> AllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -82,7 +66,7 @@ namespace UniBotJG.Dialogs
                     return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
                 }
 
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
 
             }
         }

@@ -44,7 +44,7 @@ namespace UniBotJG.Dialogs
         }
         private async Task<DialogTurnResult> GetMoreInfo(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Yes as long as they are account holders or legal prosecutors of the account. However the information I gathered tells me you currently have a regular deposit account. The Special Account for Emigrants might fulfill your needs in a better way. Would you like to know more about this account?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Yes, as long as they are account holders or legal prosecutors of the account. However, the information I gathered tells me you currently have a regular deposit account. The Special Account for Emigrants might fulfill your needs in a better way. Would you like to know more about this account?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> CheckMoreInfo(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -65,11 +65,11 @@ namespace UniBotJG.Dialogs
             }
             if(luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
-                return await stepContext.PromptAsync(nameof(WhereToReceiveDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(WhereToReceiveDialog), null, cancellationToken);
             }
             else
             {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry I didn’t understand you. Can you please repeat what you said?")}, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?")}, cancellationToken);
             }
         }
 

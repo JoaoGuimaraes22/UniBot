@@ -62,7 +62,7 @@ namespace UniBotJG.Dialogs
             {
                 return await stepContext.BeginDialogAsync(nameof(InfoSendDialog),null, cancellationToken);
             }
-            if(luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+            if(luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
                 return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
             }
@@ -85,7 +85,7 @@ namespace UniBotJG.Dialogs
             {
                 return await stepContext.BeginDialogAsync(nameof(InfoSendDialog), null, cancellationToken);
             }
-            if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
                 return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
             }

@@ -47,12 +47,12 @@ namespace UniBotJG.Dialogs
             if (userProfile.ChosePhone == true)
             {
                 //Send SMS
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone.") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone.Is there anything helse I can help you with?") }, cancellationToken);
             }
             else
             {
                 //Send email
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your email adress.") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your email adress. Is there anything helse I can help you with?") }, cancellationToken);
 
             }
 
@@ -60,7 +60,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.BeginDialogAsync(nameof(GetHelpDialog), null, cancellationToken);
+            return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
         }
     }
 }

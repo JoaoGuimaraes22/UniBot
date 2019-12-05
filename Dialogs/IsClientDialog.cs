@@ -65,12 +65,12 @@ namespace UniBotJG.Dialogs
             if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
             {
                 userProfile.NIF = stepContext.Result.ToString();
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text($"To confirm, your NIF is {userProfile.NIF}, right?")}, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text($"For confirmation, your NIF is {userProfile.NIF}, right?")}, cancellationToken);
             }
             else
             {
                 userProfile.NIF = "None";
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("I'm sorry, this is not a valid NIF. Can you please repeat what you said") }, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(ReEnterNIFDialog), null, cancellationToken);
 
             }
         }
@@ -103,7 +103,7 @@ namespace UniBotJG.Dialogs
                 if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
                 {
                     userProfile.NIF = stepContext.Result.ToString();
-                    return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"To confirm, your NIF is {userProfile.NIF}, right?") }, cancellationToken);
+                    return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"For confirmation, your NIF is {userProfile.NIF}, right?") }, cancellationToken);
                 }
                 else
                 {
