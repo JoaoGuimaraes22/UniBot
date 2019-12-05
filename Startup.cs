@@ -57,6 +57,9 @@ namespace UniBotJG
                 Host = Configuration.GetValue<string>($"QnAEndpointHostName")
             });
 
+            //GetHttp
+            services.AddHttpClient();
+
             //Luis Register
             services.AddSingleton<LuisSetup>();
 
