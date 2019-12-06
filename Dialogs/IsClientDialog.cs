@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public IsClientDialog(LuisSetup luisRecognizer, ILogger<IsClientDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GetHelpDialog getHelp, ReEnterNIFDialog reEnter)
+        public IsClientDialog(LuisSetup luisRecognizer, ILogger<IsClientDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GetHelpDialog getHelp)
             : base(nameof(IsClientDialog))
         {
             _recognizer = luisRecognizer;
@@ -32,14 +32,13 @@ namespace UniBotJG.Dialogs
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(noUnderstand);
             AddDialog(getHelp);
-            AddDialog(reEnter);
+
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 AskNIFAsync,
                 GetNIFAsync,
                 ConfirmNIFAsync,
-                ReConfirmNIFAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
@@ -65,77 +64,32 @@ namespace UniBotJG.Dialogs
             if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
             {
                 userProfile.NIF = stepContext.Result.ToString();
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text($"For confirmation, your NIF is {userProfile.NIF}, right?")}, cancellationToken);
+                return await stepContext.NextAsync();
             }
             else
             {
                 userProfile.NIF = "None";
-                return await stepContext.BeginDialogAsync(nameof(ReEnterNIFDialog), null, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
 
             }
         }
+ 
 
         private async Task<DialogTurnResult> ConfirmNIFAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            if (!_recognizer.IsConfigured)
-            {
-                await stepContext.Context.SendActivityAsync(
-                MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
-                return await stepContext.NextAsync(null, cancellationToken);
-            }
-            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-            
             var userProfile = new UserProfile();
-            if(userProfile.NIF != "None")
+            var nifRegex = new Regex("^[0-9]+$");
+            if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
             {
-                if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(GetHelpDialog), null, cancellationToken);
-                }
-                else
-                {
-                    return await stepContext.BeginDialogAsync(nameof(ReEnterNIFDialog), null, cancellationToken);
-                }
+                userProfile.NIF = stepContext.Result.ToString();
+                return await stepContext.NextAsync();
             }
             else
             {
-                var nifRegex = new Regex("^[0-9]+$");
-                if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
-                {
-                    userProfile.NIF = stepContext.Result.ToString();
-                    return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"For confirmation, your NIF is {userProfile.NIF}, right?") }, cancellationToken);
-                }
-                else
-                {
-                    userProfile.NIF = "None";
-                    return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
-
-                }
-            }
-        }
-
-
-        private async Task<DialogTurnResult> ReConfirmNIFAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
-        {
-            var userProfile = new UserProfile();
-            if( userProfile.NIF != "None")
-            {
-                var nifRegex = new Regex("^[0-9]+$");
-                if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
-                {
-                    userProfile.NIF = stepContext.Result.ToString();
-                    return await stepContext.BeginDialogAsync(nameof(GetHelpDialog), null, cancellationToken);
-                }
-                else
-                {
-                    return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
-                }
-            }
-            else
-            {
+                userProfile.NIF = "None";
                 return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
-            }
 
+            }
         }
     }
 }
