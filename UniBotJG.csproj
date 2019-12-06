@@ -26,6 +26,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.0.1" />
     <PackageReference Include="System.Management" Version="4.7.0" />
     <PackageReference Include="System.Management.Automation" Version="6.2.3" />
+    <PackageReference Include="Twilio" Version="5.36.0" />
   </ItemGroup>
 
     <ItemGroup>

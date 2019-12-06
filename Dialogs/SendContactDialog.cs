@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Schema;
 using UniBotJG.CognitiveModels;
 using UniBotJG.StateManagement;
+using Twilio;
 using MailKit;
 using System.Management.Automation.Runspaces;
 using System.ComponentModel;
@@ -19,7 +20,8 @@ using MimeKit;
 using System.Data;
 using System.Drawing;
 using System.Text;
-
+using Twilio.Rest.Api.V2010.Account;
+using Twilio.Types;
 
 namespace UniBotJG.Dialogs
 {
@@ -55,12 +57,7 @@ namespace UniBotJG.Dialogs
         {
           
             var userProfile = new UserProfile();
-            if (userProfile.ChosePhone == true)
-            {
-                //Send SMS
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone. Is there anything helse I can help you with?") }, cancellationToken);
-            }
-            else
+            if (userProfile.ChoseEmail == true)
             {
                 /*
                 //Send email
@@ -84,8 +81,22 @@ namespace UniBotJG.Dialogs
                 client.Send(mail);
                 client.Disconnect(true);
                 */
-
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your email adress. Is there anything helse I can help you with?") }, cancellationToken);
+            }
+            else
+            {
+                
+                //Send SMS
+                const string accountSid = "AC59c88e4b3c40aabb389d6d6b6d42d237";
+                const string authToken = "4d0341b79fae12fc210fc833c94c4851";
+                TwilioClient.Init(accountSid, authToken);
+                var message = MessageResource.Create(
+                    body: "If you are reading this, it works",
+                    from: new PhoneNumber("+14109284731"),
+                    to: new PhoneNumber($"+351 915 109 181")
+                );
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone. Is there anything helse I can help you with?") }, cancellationToken);
+                
                 
             }
 

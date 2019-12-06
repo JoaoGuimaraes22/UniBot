@@ -87,16 +87,26 @@ namespace UniBotJG.Dialogs
             }
             else
             {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you.") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. If  you want to end this conversation, say 'NO' and if you want to continue, say 'YES'.") }, cancellationToken);
             }
             
             //return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(/*response[0].Answer*/"Test")}, cancellationToken);
         }
 
-
-
         private async Task<DialogTurnResult> RetryEnd(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            if (!_recognizer.IsConfigured)
+            {
+                await stepContext.Context.SendActivityAsync(
+                MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+                return await stepContext.NextAsync(null, cancellationToken);
+            }
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
+
             return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
         }
         }

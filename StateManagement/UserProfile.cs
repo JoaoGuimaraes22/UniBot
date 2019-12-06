@@ -17,8 +17,8 @@ namespace UniBotJG.StateManagement
         public bool HelpMe { get; set; } = false;
         public bool HasBeenPrompted { get; set; } = false;
         public bool GavePermission { get; set; } = false;
-        public bool ChosePhone { get; set; }
+        public bool ChosePhone { get; set; } = false;
         public bool IsClient { get; set; } = false;
-        public bool ChoseEmail { get; set; }
+        public bool ChoseEmail { get; set; } = false; 
     }
 }

@@ -46,7 +46,7 @@ namespace UniBotJG.Dialogs
         private async Task<DialogTurnResult> MoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
 
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("This account gives you freedom to perform your operations in Portugal and overseas; Flexibility to move it in the currency you desire and access to exclusive products. Would you like to get this and more detailed information on your phone or email?") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("This account gives you freedom to perform your operations in Portugal and overseas, flexibility to move it in the currency you desire and access to exclusive products. Would you like to get this and more detailed information on your phone or email?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> CheckMoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
