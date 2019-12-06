@@ -85,9 +85,9 @@ namespace UniBotJG.Dialogs
             }
             else
             {
-                
+
                 //Send SMS
-                
+
                 const string accountSid = "AC59c88e4b3c40aabb389d6d6b6d42d237";
                 const string authToken = "4abd5296a1ab492e18c83c1a51a9e53c";
                 TwilioClient.Init(accountSid, authToken);
