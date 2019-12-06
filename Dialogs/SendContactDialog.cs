@@ -87,17 +87,19 @@ namespace UniBotJG.Dialogs
             {
                 
                 //Send SMS
+                
                 const string accountSid = "AC59c88e4b3c40aabb389d6d6b6d42d237";
-                const string authToken = "4d0341b79fae12fc210fc833c94c4851";
+                const string authToken = "4abd5296a1ab492e18c83c1a51a9e53c";
                 TwilioClient.Init(accountSid, authToken);
+
                 var message = MessageResource.Create(
                     body: "If you are reading this, it works",
                     from: new PhoneNumber("+14109284731"),
                     to: new PhoneNumber($"+351 915 109 181")
                 );
+                
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone. Is there anything helse I can help you with?") }, cancellationToken);
-                
-                
+
             }
 
         }
