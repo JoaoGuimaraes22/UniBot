@@ -45,7 +45,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> AskHelpAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok! What can I help you with?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank you. This information is only going to be used to give you a more personalized services. How can I help you?​") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> WhatToHelpAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)

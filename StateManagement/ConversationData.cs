@@ -13,4 +13,3 @@ namespace UniBotJG.StateManagement
         public bool PromptedUserForName { get; set; }
     }
 }
-    

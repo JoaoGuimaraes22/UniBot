@@ -17,15 +17,15 @@ using System.Net.Http;
 
 namespace UniBotJG.Dialogs
 {
-    public class NoPermissionDialog : ComponentDialog
+    public class TrueNoToMainDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
         protected readonly ILogger Logger;
         private readonly UserState _userState;
-        public NoPermissionDialog(LuisSetup luisRecognizer, ILogger<NoPermissionDialog> logger, UserState userState, IConfiguration configuration, IHttpClientFactory httpClientFactory, GoodbyeDialog goodbye)
-            : base(nameof(NoPermissionDialog))
+        public TrueNoToMainDialog(LuisSetup luisRecognizer, ILogger<TrueNoToMainDialog> logger, UserState userState, IConfiguration configuration, IHttpClientFactory httpClientFactory, GoodbyeDialog goodbye, NoPermissionDialog noPermission)
+            : base(nameof(TrueNoToMainDialog))
         {
             _recognizer = luisRecognizer;
             _userState = userState;
@@ -37,6 +37,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(goodbye);
+            AddDialog(noPermission);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -51,7 +52,7 @@ namespace UniBotJG.Dialogs
         private async Task<DialogTurnResult> PreQnaAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var userProfile = new UserProfile();
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Anyhting else I can help you with?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Anyhting I can help you with?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> QnaAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -110,5 +111,5 @@ namespace UniBotJG.Dialogs
             }
             return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
         }
-        }
     }
+}

@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState,  NoUnderstandDialog noUnderstand, InitialServiceDialog initialService, NoPermissionDialog noPermission)
+        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState,  NoUnderstandDialog noUnderstand, InitialServiceDialog initialService, TrueNoToMainDialog trueNoTo)
             : base(nameof(MainDialog))
         {
             _recognizer = luisRecognizer;
@@ -32,7 +32,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new ConfirmPrompt(nameof(ConfirmPrompt)));
             AddDialog(noUnderstand);
             AddDialog(initialService);
-            AddDialog(noPermission);
+            AddDialog(trueNoTo);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -44,6 +44,7 @@ namespace UniBotJG.Dialogs
             InitialDialogId = nameof(WaterfallDialog);
         }
 
+        //First message is ran on OnMemberAddedAsync on the UniBot.cs
         private async Task<DialogTurnResult> AllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
@@ -63,7 +64,7 @@ namespace UniBotJG.Dialogs
                 }
                 if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
                 {
-                    return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(TrueNoToMainDialog), null, cancellationToken);
                 }
 
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
@@ -90,7 +91,7 @@ namespace UniBotJG.Dialogs
                 }
                 if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
                 {
-                    return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
+                    return await stepContext.BeginDialogAsync(nameof(TrueNoToMainDialog), null, cancellationToken);
                 }
 
                 return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);

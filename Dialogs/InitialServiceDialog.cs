@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public InitialServiceDialog(LuisSetup luisRecognizer, ILogger<InitialServiceDialog> logger, UserState userState, IsClientDialog isClient, IsNotClientDialog isNot, NoUnderstandDialog noUnderstand)
+        public InitialServiceDialog(LuisSetup luisRecognizer, ILogger<InitialServiceDialog> logger, UserState userState, NIFPermissionDialog nIFPermission, IsNotClientDialog isNot, NoUnderstandDialog noUnderstand)
             : base(nameof(InitialServiceDialog))
         {
             _recognizer = luisRecognizer;
@@ -31,7 +31,7 @@ namespace UniBotJG.Dialogs
             //AddDialog(new MainDialog());
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
-            AddDialog(isClient);
+            AddDialog(nIFPermission);
             AddDialog(isNot);
             AddDialog(noUnderstand);
 
@@ -64,7 +64,7 @@ namespace UniBotJG.Dialogs
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
                 userProfile.IsClient = true;
-                return await stepContext.BeginDialogAsync(nameof(IsClientDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NIFPermissionDialog), null, cancellationToken);
             }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
@@ -90,7 +90,7 @@ namespace UniBotJG.Dialogs
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
                 userProfile.IsClient = true;
-                return await stepContext.BeginDialogAsync(nameof(IsClientDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NIFPermissionDialog), null, cancellationToken);
             }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {

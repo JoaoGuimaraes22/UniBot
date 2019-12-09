@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public SuitCustomerNeedsDialog(LuisSetup luisRecognizer, ILogger<SuitCustomerNeedsDialog> logger, UserState userState)
+        public SuitCustomerNeedsDialog(LuisSetup luisRecognizer, ILogger<SuitCustomerNeedsDialog> logger, UserState userState, NoPermissionDialog noPermission)
             : base(nameof(SuitCustomerNeedsDialog))
         {
             _recognizer = luisRecognizer;
@@ -31,6 +31,7 @@ namespace UniBotJG.Dialogs
             //AddDialog(new MainDialog());
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
+            AddDialog(noPermission);
             
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -48,7 +49,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> GoToEmployeeAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.EndDialogAsync();
+            return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
         }
     }
 }

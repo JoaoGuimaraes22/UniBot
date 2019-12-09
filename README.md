@@ -1,12 +1,12 @@
 ﻿# UniBotJG
 
-Bot Framework v4 echo bot sample.
+The purpose of this Bot: is to make communication between emigrants trying to use financial services in Portugal and a company facilitaded;
 
-This bot has been created using [Bot Framework](https://dev.botframework.com), it shows how to create a simple bot that accepts input from the user and echoes it back.
+
 
 ## Prerequisites
 
-- [.NET Core SDK](https://dotnet.microsoft.com/download) version 2.1
+- [.NET Core SDK](https://dotnet.microsoft.com/download) version 3.0
 
   ```bash
   # determine dotnet version
@@ -55,7 +55,7 @@ This bot has been created using [Bot Framework](https://dev.botframework.com), i
 
 To learn more about deploying a bot to Azure, see [Deploy your bot to Azure](https://aka.ms/azuredeployment) for a complete list of deployment instructions.
 
-## Further reading
+## Further reading for documentation if you want to know more
 
 - [Bot Framework Documentation](https://docs.botframework.com)
 - [Bot Basics](https://docs.microsoft.com/azure/bot-service/bot-builder-basics?view=azure-bot-service-4.0)

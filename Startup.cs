@@ -64,7 +64,6 @@ namespace UniBotJG
             services.AddSingleton<LuisSetup>();
 
             // The Dialog that will be run by the bot.
-
             services.AddSingleton<GetAssistantDialog>();
             services.AddSingleton<GetHelpDialog>();
             services.AddSingleton<GetPhoneDialog>();
@@ -78,11 +77,12 @@ namespace UniBotJG
             services.AddSingleton<IsClientDialog>();
             services.AddSingleton<IsNotClientDialog>();
             services.AddSingleton<MainDialog>();
+            services.AddSingleton<NIFPermissionDialog>();
             services.AddSingleton<NoPermissionDialog>();
             services.AddSingleton<NoUnderstandDialog>();
-            services.AddSingleton<ReEnterNIFDialog>();
             services.AddSingleton<SendContactDialog>();
             services.AddSingleton<SuitCustomerNeedsDialog>();
+            services.AddSingleton<TrueNoToMainDialog>();
             services.AddSingleton<WantMoreDialog>();
             services.AddSingleton<WhereToReceiveDialog>();
 
