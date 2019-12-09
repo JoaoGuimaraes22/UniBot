@@ -20,7 +20,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public HaveAnAccountDialog(LuisSetup luisRecognizer, ILogger<HaveAnAccountDialog> logger, UserState userState, GiveOptionsDialog giveOptions, SuitCustomerNeedsDialog suitCustomer)
+        public HaveAnAccountDialog(LuisSetup luisRecognizer, ILogger<HaveAnAccountDialog> logger, UserState userState, GiveOptionsDialog giveOptions, SuitCustomerNeedsDialog suitCustomer, GoodbyeDialog goodbye)
             : base(nameof(HaveAnAccountDialog))
         {
             _recognizer = luisRecognizer;
@@ -32,6 +32,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(giveOptions);
             AddDialog(suitCustomer);
+            AddDialog(goodbye);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -57,6 +58,10 @@ namespace UniBotJG.Dialogs
 
             var userProfile = new UserProfile();
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
 
             if ((luisResult.TopIntent().intent == LuisIntents.Intent.Yes && userProfile.LivesInPortugal) || ((luisResult.TopIntent().intent == LuisIntents.Intent.Yes) && (userProfile.LivesInPortugal == false)) || ((luisResult.TopIntent().intent == LuisIntents.Intent.No) && (userProfile.LivesInPortugal)))
             {

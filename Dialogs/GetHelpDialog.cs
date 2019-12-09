@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public GetHelpDialog(LuisSetup luisRecognizer, ILogger<GetHelpDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GiveOptionsDialog giveOptions)
+        public GetHelpDialog(LuisSetup luisRecognizer, ILogger<GetHelpDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, GiveOptionsDialog giveOptions, GoodbyeDialog goodbye)
             : base(nameof(GetHelpDialog))
         {
             _recognizer = luisRecognizer;
@@ -32,6 +32,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(noUnderstand);
             AddDialog(giveOptions);
+            AddDialog(goodbye);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -57,6 +58,10 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
             {
                 return await stepContext.BeginDialogAsync(nameof(GiveOptionsDialog), null, cancellationToken);
@@ -77,6 +82,10 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
             {
                 return await stepContext.BeginDialogAsync(nameof(GiveOptionsDialog), null, cancellationToken);

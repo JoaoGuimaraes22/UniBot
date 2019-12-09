@@ -15,6 +15,7 @@ namespace UniBotJG.CognitiveModels
         public enum Intent
         {
             Email,
+            Exit,
             GetRealPerson,
             MyAdvantages,
             None,

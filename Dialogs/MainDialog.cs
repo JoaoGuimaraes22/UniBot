@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState,  NoUnderstandDialog noUnderstand, InitialServiceDialog initialService, TrueNoToMainDialog trueNoTo)
+        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState,  NoUnderstandDialog noUnderstand, InitialServiceDialog initialService, TrueNoToMainDialog trueNoTo, GoodbyeDialog goodbye)
             : base(nameof(MainDialog))
         {
             _recognizer = luisRecognizer;
@@ -33,6 +33,7 @@ namespace UniBotJG.Dialogs
             AddDialog(noUnderstand);
             AddDialog(initialService);
             AddDialog(trueNoTo);
+            AddDialog(goodbye);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -47,7 +48,6 @@ namespace UniBotJG.Dialogs
         //First message is ran on OnMemberAddedAsync on the UniBot.cs
         private async Task<DialogTurnResult> AllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             var userProfile = new UserProfile();
             if (!_recognizer.IsConfigured)
             {
@@ -55,6 +55,11 @@ namespace UniBotJG.Dialogs
                     MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
 
                 return await stepContext.NextAsync(null, cancellationToken);
+            }
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
             else
             {
@@ -74,7 +79,6 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> RetryAllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             var userProfile = new UserProfile();
             if (!_recognizer.IsConfigured)
             {
@@ -82,6 +86,11 @@ namespace UniBotJG.Dialogs
                     MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
 
                 return await stepContext.NextAsync(null, cancellationToken);
+            }
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
             else
             {

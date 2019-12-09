@@ -21,7 +21,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public GiveOptionsNotClientDialog(LuisSetup luisRecognizer, ILogger<GiveOptionsNotClientDialog> logger, UserState userState, WhereToReceiveDialog whereTo, InfoSendNotClientDialog infoSend, NoUnderstandDialog noUnderstand)
+        public GiveOptionsNotClientDialog(LuisSetup luisRecognizer, ILogger<GiveOptionsNotClientDialog> logger, UserState userState, WhereToReceiveDialog whereTo, InfoSendNotClientDialog infoSend, NoUnderstandDialog noUnderstand, GoodbyeDialog goodbye)
             : base(nameof(GiveOptionsNotClientDialog))
         {
             _recognizer = luisRecognizer;
@@ -33,6 +33,7 @@ namespace UniBotJG.Dialogs
             AddDialog(whereTo);
             AddDialog(infoSend);
             AddDialog(noUnderstand);
+            AddDialog(goodbye);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -59,6 +60,10 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
                 return await stepContext.BeginDialogAsync(nameof(InfoSendNotClientDialog), null, cancellationToken);
@@ -82,6 +87,10 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
                 return await stepContext.BeginDialogAsync(nameof(InfoSendNotClientDialog), null, cancellationToken);

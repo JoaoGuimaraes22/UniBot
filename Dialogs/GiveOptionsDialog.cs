@@ -20,7 +20,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public GiveOptionsDialog(LuisSetup luisRecognizer, ILogger<GiveOptionsDialog> logger, UserState userState, WhereToReceiveDialog whereToReceive, NoUnderstandDialog noUnderstand, WantMoreDialog wantMore)
+        public GiveOptionsDialog(LuisSetup luisRecognizer, ILogger<GiveOptionsDialog> logger, UserState userState, WhereToReceiveDialog whereToReceive, NoUnderstandDialog noUnderstand, WantMoreDialog wantMore, GoodbyeDialog goodbye)
             : base(nameof(GiveOptionsDialog))
         {
             _recognizer = luisRecognizer;
@@ -32,6 +32,7 @@ namespace UniBotJG.Dialogs
             AddDialog(whereToReceive);
             AddDialog(noUnderstand);
             AddDialog(wantMore);
+            AddDialog(goodbye);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -58,6 +59,10 @@ namespace UniBotJG.Dialogs
 
             var userProfile = new UserProfile();
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
 
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
@@ -84,6 +89,10 @@ namespace UniBotJG.Dialogs
 
             var userProfile = new UserProfile();
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
 
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {

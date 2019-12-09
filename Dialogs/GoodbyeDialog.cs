@@ -50,7 +50,7 @@ namespace UniBotJG.Dialogs
             //}
             //var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. Thank you. If you need additional assistance you can contact our direct line or speak with an employee at one of our branches​") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok, thank you. If you need additional assistance you can contact our direct line or speak with an employee at one of our branches​") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> EndingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
