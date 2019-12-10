@@ -40,6 +40,7 @@ namespace UniBotJG.Dialogs
                 OptionAsync,
                 MoreAsync,
                 RetryMoreAsync,
+                EndAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
@@ -70,7 +71,7 @@ namespace UniBotJG.Dialogs
             }
             if(luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
-                return await stepContext.PromptAsync(nameof(WhereToReceiveDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(WhereToReceiveDialog), null, cancellationToken);
             }
             else
             {
@@ -97,12 +98,17 @@ namespace UniBotJG.Dialogs
             }
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
-                return await stepContext.PromptAsync(nameof(WhereToReceiveDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(WhereToReceiveDialog), null, cancellationToken);
             }
             else
             {
                 return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
             }
+        }
+
+        private async Task<DialogTurnResult> EndAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.EndDialogAsync(null, cancellationToken);
         }
     }
 }

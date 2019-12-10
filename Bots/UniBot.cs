@@ -59,16 +59,26 @@ namespace UniBotJG.Bots
             // Save any state changes that might have occured during the turn.
             await _conversationState.SaveChangesAsync(turnContext, false, cancellationToken);
             await _userState.SaveChangesAsync(turnContext, false, cancellationToken);
+
+            if (turnContext.Activity.Type == ActivityTypes.ConversationUpdate)
+            {
+                if (turnContext.Activity.MembersAdded != null)
+                {
+                    await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
+                }
+            }
+
         }
 
-        
+
         protected override async Task OnMembersAddedAsync(IList<ChannelAccount> membersAdded, ITurnContext<IConversationUpdateActivity> turnContext, CancellationToken cancellationToken)
         {
             foreach (var member in membersAdded)
             {
                 if (member.Id != turnContext.Activity.Recipient.Id)
                 {
-                    await turnContext.SendActivityAsync(CreateActivityWithTextAndSpeak($"Hi welcome to Crédito Agrícola. In order to provide you with a more personalized service do you allow me to store and use your personal information?"), cancellationToken);
+                    //await turnContext.SendActivityAsync(CreateActivityWithTextAndSpeak($"Hi welcome to Crédito Agrícola. In order to provide you with a more personalized service do you allow me to store and use your personal information?"), cancellationToken);
+                    await _dialog.RunAsync(turnContext, _conversationState.CreateProperty<DialogState>(nameof(DialogState)), cancellationToken);
                 }
             }
         }

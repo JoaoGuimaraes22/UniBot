@@ -12,7 +12,6 @@ using Microsoft.Bot.Schema;
 using UniBotJG.CognitiveModels;
 using UniBotJG.StateManagement;
 
-
 namespace UniBotJG.Dialogs
 {
     public class GoodbyeDialog : ComponentDialog
@@ -40,6 +39,7 @@ namespace UniBotJG.Dialogs
             InitialDialogId = nameof(WaterfallDialog);
         }
 
+
         private async Task<DialogTurnResult> SayonaraAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             //if (!_recognizer.IsConfigured)
@@ -50,13 +50,23 @@ namespace UniBotJG.Dialogs
             //}
             //var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok, thank you. If you need additional assistance you can contact our direct line or speak with an employee at one of our branches​") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> EndingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            //DateTime startTime = DateTime.UtcNow;
+            //while (true)
+            //{
+            //    if(DateTimeOffset.Now.Subtract(startTime).TotalMilliseconds > 5000)
+            //    {
+            //        //throw new TimeoutException();
+            //        return await stepContext.EndDialogAsync();
 
-            return await stepContext.EndDialogAsync();
+            //    }
+            //}
+            return await stepContext.EndDialogAsync(null, cancellationToken);
         }
     }
 }

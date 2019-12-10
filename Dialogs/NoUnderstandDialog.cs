@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Windows;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,7 +47,10 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> GoToAssistantAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            return await stepContext.EndDialogAsync();
+
+            //Application.Restart();
+            //Environment.Exit(0);
+            return await stepContext.EndDialogAsync(null, cancellationToken);
         }
     }
 }

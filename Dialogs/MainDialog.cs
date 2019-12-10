@@ -37,15 +37,23 @@ namespace UniBotJG.Dialogs
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
+                HelloDialog,
                 AllowInfoStoreAsync,
                 RetryAllowInfoStoreAsync,
+                RedoDialog,
             }));
 
             // The initial child Dialog to run.
             InitialDialogId = nameof(WaterfallDialog);
         }
 
-        //First message is ran on OnMemberAddedAsync on the UniBot.cs
+
+        private async Task<DialogTurnResult> HelloDialog(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            var messageText = "Hi welcome to Crédito Agrícola. In order to provide you with a more personalized service do you allow me to store and use your personal information?";
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(messageText) }, cancellationToken);
+        }
+
         private async Task<DialogTurnResult> AllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var userProfile = new UserProfile();
@@ -107,5 +115,12 @@ namespace UniBotJG.Dialogs
 
             }
         }
+
+        private async Task<DialogTurnResult> RedoDialog(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            string promptMessage = "Hi welcome to Crédito Agrícola. In order to provide you with a more personalized service do you allow me to store and use your personal information?";
+            return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
+        }
+
     }
 }

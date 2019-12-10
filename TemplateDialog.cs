@@ -51,5 +51,22 @@ namespace UniBotJG.Dialogs
             //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Isn't client") }, cancellationToken);
         }
+
+        //private readonly IHttpClientFactory _httpClientFactory;
+        //private readonly IConfiguration _configuration;
+
+        //(IHttpClientFactory httpClient, IConfiguration configuration)
+        //var httpClient = _httpClientFactory.CreateClient();
+        //var qnaMaker = new QnAMaker(new QnAMakerEndpoint
+        //{
+        //    KnowledgeBaseId = _configuration["QnAKnowledgebaseId"],
+        //    EndpointKey = _configuration["QnAEndpointKey"],
+        //    Host = _configuration["QnAEndpointHostName"]
+        //},
+        //    null,
+        //    httpClient);
+
+        //// The actual call to the QnA Maker service.
+        //var response = await qnaMaker.GetAnswersAsync(stepContext.Context);
     }
 }

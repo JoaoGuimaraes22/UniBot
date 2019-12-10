@@ -9,9 +9,9 @@ namespace UniBotJG.StateManagement
     public class UserProfile
     {
         //Storing User Data
-
         public string NIF { get; set; }
         public bool LivesInPortugal{ get; set; }
+        public bool NotService { get; set; } = false;
         public bool GavePermission { get; set; } = false;
         public bool ChosePhone { get; set; } = false;
         public bool IsClient { get; set; } = false;

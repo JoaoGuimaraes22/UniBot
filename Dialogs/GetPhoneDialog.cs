@@ -35,7 +35,8 @@ namespace UniBotJG.Dialogs
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
                 PleaseSendAsync,
-                FinalAsync
+                FinalAsync,
+                EndAsync,
             }));
 
             InitialDialogId = nameof(WaterfallDialog);
@@ -57,6 +58,11 @@ namespace UniBotJG.Dialogs
         private async Task<DialogTurnResult> FinalAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
+        }
+
+        private async Task<DialogTurnResult> EndAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
+        {
+            return await stepContext.EndDialogAsync(null, cancellationToken);
         }
     }
 }
