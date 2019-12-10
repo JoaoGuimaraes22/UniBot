@@ -1,20 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
-using UniBotJG.Dialogs;
-using Microsoft.Bot.Builder.AI.Luis;
-using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Logging;
+using System.Text.RegularExpressions;
+using System.Threading;
+using System.Threading.Tasks;
 using UniBotJG.CognitiveModels;
 using UniBotJG.StateManagement;
-using System.Text.RegularExpressions;
 
 namespace UniBotJG.Dialogs
 {
+    //Asks what user Tax ID is
     public class IsClientDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
@@ -48,14 +44,16 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> AskNIFAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Aks for NIF, if NIFPermissionwas given 
+            //Initial Prompt
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. What is your Tax ID?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> GetNIFAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var userProfile = new UserProfile();
+            //Configures NIF regex validator
             var nifRegex = new Regex("^[0-9]+$");
+
+            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -64,17 +62,25 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+
+            //Instantiates UserProfile storage
+            var userProfile = new UserProfile();
+
+            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
+
+            //If NIF is validated / is equal to Regex
             if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
             {
-                //Check if NIF equals NIF Regex
+                //Saves NIF to storage
                 userProfile.NIF = stepContext.Result.ToString();
                 return await stepContext.BeginDialogAsync(nameof(GetHelpDialog), null, cancellationToken);
-                //return await stepContext.NextAsync();
             }
+
+            //Sets NIF in storage to "None" and retries
             else
             {
                 userProfile.NIF = "None";
@@ -82,12 +88,14 @@ namespace UniBotJG.Dialogs
 
             }
         }
- 
+
 
         private async Task<DialogTurnResult> ConfirmNIFAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var userProfile = new UserProfile();
+            //Configures NIF regex validator
             var nifRegex = new Regex("^[0-9]+$");
+
+            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -96,15 +104,25 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+
+            //Instantiates UserProfile storage
+            var userProfile = new UserProfile();
+
+            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
+
+            //If NIF is validated / is equal to Regex
             if (nifRegex.IsMatch(stepContext.Result.ToString()) && (stepContext.Result.ToString().Length == 9))
             {
+                //Saves NIF to storage
                 userProfile.NIF = stepContext.Result.ToString();
                 return await stepContext.BeginDialogAsync(nameof(GetHelpDialog), null, cancellationToken);
             }
+
+            //Sets NIF storage to "None", goes to NoUnderstandDialog
             else
             {
                 userProfile.NIF = "None";
@@ -115,6 +133,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> EndAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            //For safety
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
     }

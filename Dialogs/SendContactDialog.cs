@@ -22,12 +22,11 @@ using System.Drawing;
 using System.Text;
 using Twilio.Rest.Api.V2010.Account;
 using Twilio.Types;
-
 namespace UniBotJG.Dialogs
 {
+    //Sends SMS/ (opt.)email
     public class SendContactDialog : ComponentDialog
     {
-
         private readonly LuisSetup _recognizer;
         protected readonly ILogger Logger;
         private readonly UserState _userState;
@@ -57,6 +56,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> SendAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            //Configues LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -65,12 +65,17 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+
+            //Instantiates UserProfile storage
+            var userProfile = new UserProfile();
+
+            //If intent is exit
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
 
-            var userProfile = new UserProfile();
+            //If user chose email
             if (userProfile.ChoseEmail == true)
             {
                 /*
@@ -97,6 +102,8 @@ namespace UniBotJG.Dialogs
                 */
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your email adress. Is there anything helse I can help you with?") }, cancellationToken);
             }
+
+            //If user chose phone
             else
             {
 
@@ -112,17 +119,6 @@ namespace UniBotJG.Dialogs
                 //    to: new PhoneNumber($"+351 915 109 181")
                 //);
 
-                if (!_recognizer.IsConfigured)
-                {
-                    await stepContext.Context.SendActivityAsync(
-                        MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
-
-                    return await stepContext.NextAsync(null, cancellationToken);
-                }
-                if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
-                }
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone. Is there anything else I help you with?") }, cancellationToken);
 
             }
@@ -131,6 +127,7 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -139,24 +136,32 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+
+            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
+
+            //If intent is no
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-            if(luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+
+            //If intent is yes
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
                 return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
             }
 
+            //Goes to NoPermissionDialog
             return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
         }
 
         private async Task<DialogTurnResult> EndAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            //For safety
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
     }
