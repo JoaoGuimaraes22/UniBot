@@ -11,7 +11,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Schema;
 using UniBotJG.CognitiveModels;
 using UniBotJG.StateManagement;
-
+using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Bot.Builder.AI.QnA;
 
 namespace UniBotJG.Dialogs
 {
@@ -20,13 +22,17 @@ namespace UniBotJG.Dialogs
         private readonly LuisSetup _recognizer;
         protected readonly ILogger Logger;
         private readonly UserState _userState;
+        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly IConfiguration _configuration;
 
-        public IsNotClientDialog(LuisSetup luisRecognizer, ILogger<IsNotClientDialog> logger, UserState userState, GiveOptionsNotClientDialog giveOptions, NoUnderstandDialog noUnderstand, GoodbyeDialog goodbye)
+        public IsNotClientDialog(LuisSetup luisRecognizer, ILogger<IsNotClientDialog> logger, UserState userState, GiveOptionsNotClientDialog giveOptions, NoUnderstandDialog noUnderstand, GoodbyeDialog goodbye, IHttpClientFactory httpClient, IConfiguration configuration)
             : base(nameof(IsNotClientDialog))
         {
             _recognizer = luisRecognizer;
             _userState = userState;
             Logger = logger;
+            _configuration = configuration;
+            _httpClientFactory = httpClient;
 
             //AddDialog(new MainDialog());
             AddDialog(new TextPrompt(nameof(TextPrompt)));
@@ -68,6 +74,27 @@ namespace UniBotJG.Dialogs
             if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
             {
                 return await stepContext.BeginDialogAsync(nameof(GiveOptionsNotClientDialog), null, cancellationToken);
+            }
+
+            //Setting up Qna
+            var httpClient = _httpClientFactory.CreateClient();
+            var qnaMaker = new QnAMaker(new QnAMakerEndpoint
+            {
+                KnowledgeBaseId = _configuration["QnAKnowledgebaseId"],
+                EndpointKey = _configuration["QnAEndpointKey"],
+                Host = _configuration["QnAEndpointHostName"]
+            },
+                null,
+                httpClient);
+
+            // The actual call to the QnA Maker service.
+            var qnaOptions = new QnAMakerOptions();
+            qnaOptions.ScoreThreshold = 0.4F;
+
+            var response = await qnaMaker.GetAnswersAsync(stepContext.Context, qnaOptions);
+            if (response != null && response.Length > 0)
+            {
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"{response[0].Answer}. To continue, say 'YES'.") }, cancellationToken);
             }
             else
             {

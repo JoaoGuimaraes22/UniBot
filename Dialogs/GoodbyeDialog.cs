@@ -66,7 +66,7 @@ namespace UniBotJG.Dialogs
 
             //    }
             //}
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            return await stepContext.ReplaceDialogAsync(nameof(MainDialog), null, cancellationToken);
         }
     }
 }

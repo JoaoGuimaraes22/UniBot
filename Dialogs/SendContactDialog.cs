@@ -33,7 +33,7 @@ namespace UniBotJG.Dialogs
         private readonly UserState _userState;
 
 
-        public SendContactDialog(LuisSetup luisRecognizer, ILogger<SendContactDialog> logger, UserState userState, GoodbyeDialog goodbye, NoPermissionDialog no)
+        public SendContactDialog(LuisSetup luisRecognizer, ILogger<SendContactDialog> logger, UserState userState, GoodbyeDialog goodbye, NoPermissionDialog noPermission)
             : base(nameof(SendContactDialog))
         {
             _recognizer = luisRecognizer;
@@ -43,7 +43,7 @@ namespace UniBotJG.Dialogs
             AddDialog(new TextPrompt(nameof(TextPrompt)));
             AddDialog(new ChoicePrompt(nameof(ChoicePrompt)));
             AddDialog(goodbye);
-            AddDialog(no);
+            AddDialog(noPermission);
 
             AddDialog(new WaterfallDialog(nameof(WaterfallDialog), new WaterfallStep[]
             {
@@ -123,7 +123,7 @@ namespace UniBotJG.Dialogs
                 {
                     return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
                 }
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone. Is there anything helse I can help you with?") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Thank You. More information on the Special Account for emigrants was sent to your phone. Is there anything else I help you with?") }, cancellationToken);
 
             }
 
@@ -131,6 +131,27 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> FinalStepAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            if (!_recognizer.IsConfigured)
+            {
+                await stepContext.Context.SendActivityAsync(
+                    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+
+                return await stepContext.NextAsync(null, cancellationToken);
+            }
+            var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
+            }
+            if(luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+            {
+                return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
+            }
+
             return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
         }
 

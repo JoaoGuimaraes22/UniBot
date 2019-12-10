@@ -53,7 +53,7 @@ namespace UniBotJG.Dialogs
         private async Task<DialogTurnResult> PreQnaAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
             var userProfile = new UserProfile();
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Anyhting I can help you with?") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok, anyhting I can help you with?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> QnaAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
@@ -89,7 +89,9 @@ namespace UniBotJG.Dialogs
             }
 
             // The actual call to the QnA Maker service.
-            var response = await qnaMaker.GetAnswersAsync(stepContext.Context);
+            var qnaOptions = new QnAMakerOptions();
+            qnaOptions.ScoreThreshold = 0.4F;
+            var response = await qnaMaker.GetAnswersAsync(stepContext.Context, qnaOptions);
             if (response != null && response.Length > 0)
             {
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"{response[0].Answer}. To continue, say 'YES'.") }, cancellationToken);
@@ -120,6 +122,7 @@ namespace UniBotJG.Dialogs
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
+
             return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
         }
 

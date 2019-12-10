@@ -71,7 +71,7 @@ namespace UniBotJG.Dialogs
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-            if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily && luisResult.TopIntent().score > 0.70)
             {
                 return await stepContext.BeginDialogAsync(nameof(GiveOptionsDialog), null, cancellationToken);
             }
@@ -89,8 +89,10 @@ namespace UniBotJG.Dialogs
                     httpClient);
 
             // The actual call to the QnA Maker service.
-            var response = await qnaMaker.GetAnswersAsync(stepContext.Context);
-            if (response != null && response.Length > 0 && response[0].Score > 75)
+            var qnaOptions = new QnAMakerOptions();
+            qnaOptions.ScoreThreshold = 0.4F;
+            var response = await qnaMaker.GetAnswersAsync(stepContext.Context, qnaOptions);
+            if (response != null && response.Length > 0)
             {
                 userProfile.NotService = true;
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"{response[0].Answer}. To continue, say 'YES'.") }, cancellationToken);
@@ -127,8 +129,10 @@ namespace UniBotJG.Dialogs
                     null,
                     httpClient);
             // The actual call to the QnA Maker service.
-            var response = await qnaMaker.GetAnswersAsync(stepContext.Context);
-            if (response != null && response.Length > 0 && response[0].Score > 75)
+            var qnaOptions = new QnAMakerOptions();
+            qnaOptions.ScoreThreshold = 0.4F;
+            var response = await qnaMaker.GetAnswersAsync(stepContext.Context, qnaOptions);
+            if (response != null && response.Length > 0)
             {
                 userProfile.NotService = true;
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"{response[0].Answer}. To continue, say 'YES'.") }, cancellationToken);

@@ -70,7 +70,6 @@ namespace UniBotJG
             services.AddSingleton<GiveOptionsDialog>();
             services.AddSingleton<GiveOptionsNotClientDialog>();
             services.AddSingleton<GoodbyeDialog>();
-            services.AddSingleton<HaveAnAccountDialog>();
             services.AddSingleton<InfoSendDialog>();
             services.AddSingleton<InfoSendNotClientDialog>();
             services.AddSingleton<InitialServiceDialog>();

@@ -80,6 +80,8 @@ namespace UniBotJG.Dialogs
                 MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
                 return await stepContext.NextAsync(null, cancellationToken);
             }
+
+
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {

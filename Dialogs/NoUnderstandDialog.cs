@@ -49,8 +49,8 @@ namespace UniBotJG.Dialogs
         {
 
             //Application.Restart();
-            //Environment.Exit(0);
-            return await stepContext.EndDialogAsync(null, cancellationToken);
+            //Environment.Exit(0)
+            return await stepContext.ReplaceDialogAsync(nameof(MainDialog), null, cancellationToken);
         }
     }
 }
