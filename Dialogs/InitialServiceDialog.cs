@@ -1,16 +1,20 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Logging;
-using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using UniBotJG.Dialogs;
+using Microsoft.Bot.Builder.AI.Luis;
+using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Schema;
 using UniBotJG.CognitiveModels;
 using UniBotJG.StateManagement;
 
 
 namespace UniBotJG.Dialogs
 {
-    //Asks if user is CA client
     public class InitialServiceDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
@@ -45,13 +49,12 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> AreYouClientAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Initial Prompt
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Are you a client of Crédito Agrícola? ") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> IfIsAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Configures LUIS
+            var userProfile = new UserProfile();
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -60,40 +63,28 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-
-            //Instantiates UserProfile storage
-            var userProfile = new UserProfile();
-
-            //If intent is exit
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-
-            //If intent is yes
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
-                //Sets storage IsClient to true
                 userProfile.IsClient = true;
                 return await stepContext.BeginDialogAsync(nameof(NIFPermissionDialog), null, cancellationToken);
             }
-
-            //If intent is no
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
                 return await stepContext.BeginDialogAsync(nameof(IsNotClientDialog), null, cancellationToken);
             }
-
-            //Retries
             else
             {
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
+                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt=MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?")}, cancellationToken);
             }
         }
 
         private async Task<DialogTurnResult> IfIsRetryAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Configures LUIS
+            var userProfile = new UserProfile();
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -102,39 +93,27 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-
-            //Instantiates UserProfile storage
-            var userProfile = new UserProfile();
-
-            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-
-            //If intent is yes
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
                 userProfile.IsClient = true;
                 return await stepContext.BeginDialogAsync(nameof(NIFPermissionDialog), null, cancellationToken);
             }
-
-            //If intent is no
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
                 return await stepContext.BeginDialogAsync(nameof(IsNotClientDialog), null, cancellationToken);
             }
-
-            //Goes to NoUnderstandDialog
             else
             {
-                return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
+                return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null , cancellationToken);
             }
         }
 
         private async Task<DialogTurnResult> EndAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //For safety
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 

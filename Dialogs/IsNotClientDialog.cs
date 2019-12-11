@@ -1,17 +1,22 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.AI.QnA;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using UniBotJG.Dialogs;
+using Microsoft.Bot.Builder.AI.Luis;
+using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Schema;
 using UniBotJG.CognitiveModels;
+using UniBotJG.StateManagement;
+using System.Net.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Bot.Builder.AI.QnA;
 
 namespace UniBotJG.Dialogs
 {
-    //Asks user what help to give
     public class IsNotClientDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
@@ -49,13 +54,11 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> HelpAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Initial prompt
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok. What can I help you with?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> WhatToHelpAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -64,14 +67,10 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-
-            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-
-            //If intent is "i do not live in portugal but i have family here and i wanted to know if they are able to access my account?​"
             if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
             {
                 return await stepContext.BeginDialogAsync(nameof(GiveOptionsNotClientDialog), null, cancellationToken);
@@ -89,18 +88,14 @@ namespace UniBotJG.Dialogs
                 httpClient);
 
             // The actual call to the QnA Maker service.
-            //Sets QnA Score Threshold
             var qnaOptions = new QnAMakerOptions();
             qnaOptions.ScoreThreshold = 0.4F;
 
-            //Gets response from QnA
             var response = await qnaMaker.GetAnswersAsync(stepContext.Context, qnaOptions);
             if (response != null && response.Length > 0)
             {
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"{response[0].Answer}. To continue, say 'YES'.") }, cancellationToken);
             }
-
-            //Retries
             else
             {
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
@@ -110,7 +105,6 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> RetryWhatToHelpAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -119,20 +113,14 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-
-            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-
-            //if intent is "i do not live in portugal but i have family here and i wanted to know if they are able to access my account?​"
             if (luisResult.TopIntent().intent == LuisIntents.Intent.ServiceToShareWithFamily)
             {
                 return await stepContext.BeginDialogAsync(nameof(GiveOptionsNotClientDialog), null, cancellationToken);
             }
-
-            //Goes to NoUnderstandDialog
             else
             {
                 return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
@@ -142,7 +130,6 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> EndAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //For safety
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
     }
