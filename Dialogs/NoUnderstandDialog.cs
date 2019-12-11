@@ -1,12 +1,19 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Extensions.Logging;
-using System.Threading;
+﻿using System;
+using System.Windows;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using UniBotJG.Dialogs;
+using Microsoft.Bot.Builder.AI.Luis;
+using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Schema;
+using UniBotJG.CognitiveModels;
 
 namespace UniBotJG.Dialogs
 {
-    //Dialog when bot doesn't undestand x2
     public class NoUnderstandDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
@@ -35,13 +42,14 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> GetAssistantAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Initial prompt
-            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("I’m sorry but I was not able to understand you or your request. In order to provide you with a better experience an employee will receive you as soon as possible​") }, cancellationToken);
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions{Prompt = MessageFactory.Text("I’m sorry but I was not able to understand you or your request. In order to provide you with a better experience an employee will receive you as soon as possible​") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> GoToAssistantAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Restarts dialog, goes to MainDialog
+
+            //Application.Restart();
+            //Environment.Exit(0)
             return await stepContext.ReplaceDialogAsync(nameof(MainDialog), null, cancellationToken);
         }
     }

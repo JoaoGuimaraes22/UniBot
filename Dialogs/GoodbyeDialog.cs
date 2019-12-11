@@ -1,12 +1,19 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Extensions.Logging;
-using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using UniBotJG.Dialogs;
+using Microsoft.Bot.Builder.AI.Luis;
+using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Schema;
+using UniBotJG.CognitiveModels;
+using UniBotJG.StateManagement;
 
 namespace UniBotJG.Dialogs
 {
-    //Dialog when it's time to say goodbye
     public class GoodbyeDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
@@ -35,13 +42,30 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> SayonaraAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Intial prompt
+            //if (!_recognizer.IsConfigured)
+            //{
+            //    await stepContext.Context.SendActivityAsync(
+            //    MessageFactory.Text("NOTE: LUIS is not configured. To enable all capabilities, add 'LuisAppId', 'LuisAPIKey' and 'LuisAPIHostName' to the appsettings.json file.", inputHint: InputHints.IgnoringInput), cancellationToken);
+            //    return await stepContext.NextAsync(null, cancellationToken);
+            //}
+            //var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+            //if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
+
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Ok, thank you. If you need additional assistance you can contact our direct line or speak with an employee at one of our branches​") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> EndingAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //The dialog re-runs, MainDialog gets called, dialog restarts
+            //DateTime startTime = DateTime.UtcNow;
+            //while (true)
+            //{
+            //    if(DateTimeOffset.Now.Subtract(startTime).TotalMilliseconds > 5000)
+            //    {
+            //        //throw new TimeoutException();
+            //        return await stepContext.EndDialogAsync();
+
+            //    }
+            //}
             return await stepContext.ReplaceDialogAsync(nameof(MainDialog), null, cancellationToken);
         }
     }

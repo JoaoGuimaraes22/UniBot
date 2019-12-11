@@ -1,18 +1,22 @@
-﻿using Microsoft.Bot.Builder;
-using Microsoft.Bot.Builder.AI.QnA;
-using Microsoft.Bot.Builder.Dialogs;
-using Microsoft.Bot.Schema;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
-using System.Net.Http;
-using System.Threading;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using System.Threading;
+using Microsoft.Bot.Builder;
+using Microsoft.Bot.Builder.Dialogs;
+using Microsoft.Bot.Builder.AI.QnA;
+using UniBotJG.Dialogs;
+using Microsoft.Bot.Builder.AI.Luis;
+using Microsoft.Extensions.Logging;
+using Microsoft.Bot.Schema;
 using UniBotJG.CognitiveModels;
 using UniBotJG.StateManagement;
+using Microsoft.Extensions.Configuration;
+using System.Net.Http;
 
 namespace UniBotJG.Dialogs
 {
-    //Asks if user wants more help, gets mosty non sequential/no personal responses
     public class NoPermissionDialog : ComponentDialog
     {
         private readonly LuisSetup _recognizer;
@@ -47,20 +51,16 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> PreQnaAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Initial prompt
+            var userProfile = new UserProfile();
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Anyhting else I can help you with?") }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> QnaAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Instantiates UserProfile storage
             var userProfile = new UserProfile();
-
-            //Sets GavePermission in storage to true
             userProfile.GavePermission = true;
-
-            //Configures QnA
             var httpClient = _httpClientFactory.CreateClient();
+
             var qnaMaker = new QnAMaker(new QnAMakerEndpoint
             {
                 KnowledgeBaseId = _configuration["QnAKnowledgebaseId"],
@@ -70,7 +70,6 @@ namespace UniBotJG.Dialogs
             null,
             httpClient);
 
-            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -79,41 +78,33 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-
-            //If intent is exit
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-
-            //If intent is no
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
 
             // The actual call to the QnA Maker service.
-            //Sets QnA score threshold
             var qnaOptions = new QnAMakerOptions();
             qnaOptions.ScoreThreshold = 0.4F;
-
-            //Gets QnA response
             var response = await qnaMaker.GetAnswersAsync(stepContext.Context, qnaOptions);
             if (response != null && response.Length > 0)
             {
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text($"{response[0].Answer}. To continue, say 'YES'.") }, cancellationToken);
             }
-
-            //Retries
             else
             {
                 return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. If you want to end this conversation, say 'NO' and if you want to continue, say 'YES'.") }, cancellationToken);
             }
+
+            //return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(/*response[0].Answer*/"Test")}, cancellationToken);
         }
 
         private async Task<DialogTurnResult> RetryEnd(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -122,28 +113,21 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
-
-            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-
-            //If intent is no
             if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-
-            //Restarts this dialog, goes to NoPermissionDialog
             return await stepContext.BeginDialogAsync(nameof(NoPermissionDialog), null, cancellationToken);
         }
 
         private async Task<DialogTurnResult> EndAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            //For safety
             return await stepContext.EndDialogAsync(null, cancellationToken);
         }
 
     }
-}
+    }
