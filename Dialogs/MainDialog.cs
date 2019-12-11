@@ -1,19 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Threading;
-using Microsoft.Bot.Builder;
+﻿using Microsoft.Bot.Builder;
 using Microsoft.Bot.Builder.Dialogs;
-using UniBotJG.Dialogs;
-using Microsoft.Bot.Builder.AI.Luis;
-using Microsoft.Extensions.Logging;
 using Microsoft.Bot.Schema;
+using Microsoft.Extensions.Logging;
+using System.Threading;
+using System.Threading.Tasks;
 using UniBotJG.CognitiveModels;
-using UniBotJG.StateManagement;
 
 namespace UniBotJG.Dialogs
 {
+    //It's the root dialog, the birth of all speech
     public class MainDialog : ComponentDialog
     {
 
@@ -21,7 +16,7 @@ namespace UniBotJG.Dialogs
         protected readonly ILogger Logger;
         private readonly UserState _userState;
 
-        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState,  NoUnderstandDialog noUnderstand, InitialServiceDialog initialService, TrueNoToMainDialog trueNoTo, GoodbyeDialog goodbye)
+        public MainDialog(LuisSetup luisRecognizer, ILogger<MainDialog> logger, UserState userState, NoUnderstandDialog noUnderstand, InitialServiceDialog initialService, TrueNoToMainDialog trueNoTo, GoodbyeDialog goodbye)
             : base(nameof(MainDialog))
         {
             _recognizer = luisRecognizer;
@@ -50,13 +45,14 @@ namespace UniBotJG.Dialogs
 
         private async Task<DialogTurnResult> HelloDialog(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            //Initial Prompt
             var messageText = "Hi welcome to Crédito Agrícola. In order to provide you with a more personalized service do you allow me to store and use your personal information?";
             return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text(messageText) }, cancellationToken);
         }
 
         private async Task<DialogTurnResult> AllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var userProfile = new UserProfile();
+            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -65,29 +61,34 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+
+            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-            else
+
+            //If intent is yes
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
-                if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(InitialServiceDialog), null, cancellationToken);
-                }
-                if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(TrueNoToMainDialog), null, cancellationToken);
-                }
-
-                return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
-
+                return await stepContext.BeginDialogAsync(nameof(InitialServiceDialog), null, cancellationToken);
             }
+
+            //If intent is no
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.BeginDialogAsync(nameof(TrueNoToMainDialog), null, cancellationToken);
+            }
+
+            //Retries
+            return await stepContext.PromptAsync(nameof(TextPrompt), new PromptOptions { Prompt = MessageFactory.Text("Sorry, I didn’t understand you. Can you please repeat what you said?") }, cancellationToken);
+
+
         }
 
         private async Task<DialogTurnResult> RetryAllowInfoStoreAsync(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
-            var userProfile = new UserProfile();
+            //Configures LUIS
             if (!_recognizer.IsConfigured)
             {
                 await stepContext.Context.SendActivityAsync(
@@ -96,28 +97,34 @@ namespace UniBotJG.Dialogs
                 return await stepContext.NextAsync(null, cancellationToken);
             }
             var luisResult = await _recognizer.RecognizeAsync<LuisIntents>(stepContext.Context, cancellationToken);
+
+            //If intent is exit/cancel
             if (luisResult.TopIntent().intent == LuisIntents.Intent.Exit)
             {
                 return await stepContext.BeginDialogAsync(nameof(GoodbyeDialog), null, cancellationToken);
             }
-            else
+
+            //If intent is yes
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
             {
-                if (luisResult.TopIntent().intent == LuisIntents.Intent.Yes)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(InitialServiceDialog), null, cancellationToken);
-                }
-                if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
-                {
-                    return await stepContext.BeginDialogAsync(nameof(TrueNoToMainDialog), null, cancellationToken);
-                }
-
-                return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
-
+                return await stepContext.BeginDialogAsync(nameof(InitialServiceDialog), null, cancellationToken);
             }
+
+            //If intent is no
+            if (luisResult.TopIntent().intent == LuisIntents.Intent.No)
+            {
+                return await stepContext.BeginDialogAsync(nameof(TrueNoToMainDialog), null, cancellationToken);
+            }
+
+            //Goes to NoUnderstandDialog
+            return await stepContext.BeginDialogAsync(nameof(NoUnderstandDialog), null, cancellationToken);
+
+
         }
 
         private async Task<DialogTurnResult> RedoDialog(WaterfallStepContext stepContext, CancellationToken cancellationToken)
         {
+            //Restarts MainDialog, restarting the dialog itself
             string promptMessage = "Hi welcome to Crédito Agrícola. In order to provide you with a more personalized service do you allow me to store and use your personal information?";
             return await stepContext.ReplaceDialogAsync(InitialDialogId, promptMessage, cancellationToken);
         }
